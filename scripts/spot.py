@@ -20,11 +20,11 @@ class Spot:
     
     def is_closed(self):
         """Return if the spot was visited and is closed for searches."""
-        return self.color == Color.red
+        return self.color == Color.dark_red
     
     def is_open(self):
         """Return if the spot was visited and is open for searches."""
-        return self.color == Color.dark_red
+        return self.color == Color.red
     
     def is_barrier(self):
         """Return if the spot is part of the barrier."""
@@ -34,25 +34,17 @@ class Spot:
         """Return if the spot is the start point."""
         return self.color == Color.auburn
     
-    def is_end(self):
-        """Return if the spot is the end point."""
-        return self.color == Color.dark_green
-    
-    def is_path(self):
-        """Return if the spot is part of the path."""
-        return self.color == Color.orange
-    
     def reset(self):
         """Reset the color of the spot to default one."""
         self.color = Color.tea_green
     
     def make_closed(self):
         """Set the spot as visited and closed for search point by proper coloring."""
-        self.color = Color.red
+        self.color = Color.dark_red
     
     def make_open(self):
         """Set the spot as a part of a visited points area by proper coloring."""
-        self.color = Color.dark_red
+        self.color = Color.red
     
     def make_barrier(self):
         """Set the spot as a part of a barrier by proper coloring."""
@@ -61,14 +53,6 @@ class Spot:
     def make_start(self):
         """Sets the spot as the start point by proper coloring."""
         self.color = Color.auburn
-    
-    def make_end(self):
-        """Sets the spot as the end point by proper coloring."""
-        self.color = Color.dark_green
-    
-    def make_path(self):
-        """Sets the spot as a part of a path by proper coloring."""
-        self.color = Color.orange
     
     def draw(self, win):
         """Draw the square with proper color and standaralized size."""
@@ -93,3 +77,6 @@ class Spot:
         # right
         if self.col > 0 and not grid[self.row][self.col-1].is_barrier(): 
             self.neighbours.append(grid[self.row][self.col-1])
+    
+    def get_neighbours(self):
+        return self.neighbours

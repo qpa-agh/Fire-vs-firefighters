@@ -2,16 +2,13 @@ import pygame
 from grid import Grid
 from algorithm import Algorithm
 from utils import loadParameters
-from button import ButtonHandler
 
-def main(win, width, rows, heuristic):
+def main(win, width, rows):
 	"""Main function of the programme."""
 
 	grid = Grid.make_grid(rows, width)
-	ButtonHandler.initialise_list(width)
 
 	start = None
-	end = None
 
 	run = True
 	while run:
@@ -27,22 +24,12 @@ def main(win, width, rows, heuristic):
 				# if pos is within the grid
 				if row < rows and col < rows:
 					spot = grid[row][col]
-					if not start and spot != end:
+					if not start:
 						start = spot
 						start.make_start()
 
-					elif not end and spot != start:
-						end = spot
-						end.make_end()
-
-					elif spot != end and spot != start:
+					elif spot != start:
 						spot.make_barrier()
-
-				else: # check pushing button
-					y, x = pos
-					h = ButtonHandler.click_proper_button(x,y)
-					if h is not None: # button was pushed
-						heuristic = h
 
 			elif pygame.mouse.get_pressed()[2]: # RIGHT
 				pos = pygame.mouse.get_pos()
@@ -52,27 +39,24 @@ def main(win, width, rows, heuristic):
 					spot.reset()
 					if spot == start:
 						start = None
-					elif spot == end:
-						end = None
 
 			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_SPACE and start and end:
+				if event.key == pygame.K_SPACE and start:
 					Grid.clear_old_grid(win, grid, rows, width)
 					for row in grid:
 						for spot in row:
 							spot.update_neighbours(grid)
 					
-					Algorithm.a_star(lambda: Grid.draw_path(win, grid, rows, width), grid, start, end, heuristic)
+					Algorithm.spread(lambda: Grid.draw_path(win, grid, rows, width), start)
 
 				if event.key == pygame.K_c:
 					start = None
-					end = None
 					grid = Grid.make_grid(rows, width)
-		ButtonHandler.draw_all_buttons(win)
+
 		pygame.display.update()
 	pygame.quit()
 
-WIDTH, ROWS, HEURISTIC = loadParameters()
+WIDTH, ROWS = loadParameters()
 pygame.display.set_caption('Fire fighters VS fire')
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
-main(WIN, WIDTH, ROWS, HEURISTIC)
+main(WIN, WIDTH, ROWS)

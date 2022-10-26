@@ -6,6 +6,5 @@ def loadParameters():
     data = json.load(f)
     width = data['width']
     rows = data['rows']
-    heuristic = data['heuristic']
     f.close()
-    return width, rows, heuristic
+    return width, rows

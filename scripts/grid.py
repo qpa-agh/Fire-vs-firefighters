@@ -46,7 +46,7 @@ class Grid:
         win.fill(Color.tea_green)
         for row in grid:
             for spot in row:
-                if spot.is_closed() or spot.is_open() or spot.is_path():
+                if spot.is_closed() or spot.is_open():
                     spot.reset()
                     spot.draw(win)
         Grid.draw_grid(win, rows, width)

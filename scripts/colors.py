@@ -8,5 +8,5 @@ class Color():
     black = (0,0,0)
     yellow = (255,236,174)
     white = (240,250,255)
-    red = (180, 50, 50)
-    dark_red = (198, 50, 50)
+    red = (180, 30, 30)
+    dark_red = (100, 10, 10)
