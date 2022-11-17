@@ -9,3 +9,5 @@ class Color():
     ground = (159, 135, 114)
     dark_green = (148,201,169)
     tea_green = (198, 236, 174)
+    burned = (10,0,0)
+    tree = (0, 150, 0)
