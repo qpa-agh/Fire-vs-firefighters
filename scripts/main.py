@@ -3,60 +3,50 @@ from grid import Grid
 from algorithm import Algorithm
 from utils import loadParameters
 
-def main(win, width, rows):
-	"""Main function of the programme."""
 
-	grid = Grid.make_grid(rows, width)
+def main(width, rows):
+    pygame.display.set_caption("Fire figters vs fire")
+    win = pygame.display.set_mode((WIDTH, WIDTH))
+    grid = Grid(win, rows, width)
 
-	start = None
+    run = True
+    while run:
+        grid.draw()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
 
-	run = True
-	while run:
-		Grid.draw(win, grid, rows, width)
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				run = False
+            if pygame.mouse.get_pressed()[0]:  # LEFT
+                pos = pygame.mouse.get_pos()
+                row, col = grid.get_clicked_pos(pos)
 
-			if pygame.mouse.get_pressed()[0]: # LEFT
-				pos = pygame.mouse.get_pos()
-				row, col = Grid.get_clicked_pos(pos, rows, width)
+                # if pos is within the grid
+                if row < rows and col < rows:
+                    grid.make_fire(row, col)
 
-				# if pos is within the grid
-				if row < rows and col < rows:
-					spot = grid[row][col]
-					if not start:
-						start = spot
-						start.make_start()
+            elif pygame.mouse.get_pressed()[2]:  # RIGHT
+                pos = pygame.mouse.get_pos()
+                row, col = grid.get_clicked_pos(pos)
+                if row < width and col < width:
+                    grid.reset(row, col)
 
-					elif spot != start:
-						spot.make_barrier()
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_SPACE:
+            #         Grid.clear_old_grid(win, grid, rows, width)
+            #         for row in grid:
+            #             for spot in row:
+            #                 spot.update_neighbours(grid)
 
-			elif pygame.mouse.get_pressed()[2]: # RIGHT
-				pos = pygame.mouse.get_pos()
-				row, col = Grid.get_clicked_pos(pos, rows, width)
-				if row < width and col < width:
-					spot = grid[row][col]
-					spot.reset()
-					if spot == start:
-						start = None
+            #         Algorithm.spread(lambda: Grid.draw_path(
+            #             win, grid, rows, width), None)
 
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_SPACE and start:
-					Grid.clear_old_grid(win, grid, rows, width)
-					for row in grid:
-						for spot in row:
-							spot.update_neighbours(grid)
-					
-					Algorithm.spread(lambda: Grid.draw_path(win, grid, rows, width), start)
+            #     if event.key == pygame.K_c:
+            #         grid = Grid.make_grid(rows, width)
 
-				if event.key == pygame.K_c:
-					start = None
-					grid = Grid.make_grid(rows, width)
+        pygame.display.update()
+    pygame.quit()
 
-		pygame.display.update()
-	pygame.quit()
 
-WIDTH, ROWS = loadParameters()
-pygame.display.set_caption('Fire fighters VS fire')
-WIN = pygame.display.set_mode((WIDTH, WIDTH))
-main(WIN, WIDTH, ROWS)
+if __name__ == '__main__':
+    WIDTH, ROWS = loadParameters()
+    main(WIDTH, ROWS)
