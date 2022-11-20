@@ -16,7 +16,7 @@ class Cell:
         self.row = row
         self.col = col
         self.visual = Spot(row, col)
-        self.neighbours = []
+        self.neighbours = {} # neighbor idx to cell
     
     def make_fire(self):
         self.cell_type = CellType.FIRE
@@ -25,3 +25,7 @@ class Cell:
     def make_tree(self):
         self.cell_type = CellType.TREE
         self.visual.make_tree() 
+    
+    def make_burned(self):
+        self.cell_type == CellType.BURNED
+        self.visual.make_burned()
