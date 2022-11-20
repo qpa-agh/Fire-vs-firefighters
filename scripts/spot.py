@@ -12,7 +12,7 @@ class Spot:
         self.col = col
         self.x = row * Spot.width
         self.y = col * Spot.width
-        self.color = Color.tea_green
+        self.color = Color.grass_green
         self.neighbours = []
 
     def get_pos(self):
@@ -24,14 +24,19 @@ class Spot:
         pygame.draw.rect(
             Spot.win, self.color, (self.x, self.y, Spot.width, Spot.width))
 
-    def make_fire(self):
-        self.color = Color.fire
+    def make_fire(self, wood, burned_wood):
+        stage = burned_wood/(burned_wood + wood) / (1/6)
+        self.color = Color.fire[int(stage)]
 
-    def make_burned(self):
-        self.color = Color.burned
+    def make_burned(self, burned_wood:int):
+        if burned_wood >= 1:
+            burned_wood -= 1
+        else:
+            burned_wood = 0
+        self.color = Color.burned[int(burned_wood)]
     
-    def make_tree(self):
-        self.color = Color.tree
+    def make_tree(self, wood:int):
+        self.color = Color.tree[wood-1]
     
     @staticmethod
     def set_parameters(width_, win):

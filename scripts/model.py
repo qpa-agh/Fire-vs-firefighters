@@ -23,11 +23,13 @@ class Model:
         random_list = random.sample(
             range(0, self.cells_y*self.cells_x - 1), trees)
         for nr in random_list:
+            self.grid[nr//self.cells_x][nr % self.cells_x].wood = random.randint(1, 5)
             self.grid[nr//self.cells_x][nr % self.cells_x].make_tree()
+            
 
     def draw(self):
         """Draws square grid with colored spots."""
-        self.win.fill(Color.tea_green)
+        self.win.fill(Color.grass_green)
         for row in self.grid:
             for cell in row:
                 cell.visual.draw()
@@ -36,10 +38,10 @@ class Model:
     def draw_grid(self):
         """Draws square grid."""
         for row_idx in range(self.cells_y):
-            pygame.draw.line(self.win, Color.dark_green,
+            pygame.draw.line(self.win, Color.grid,
                              (0, row_idx * self.gap), (self.width, row_idx*self.gap))
             for col_idx in range(self.cells_y):
-                pygame.draw.line(self.win, Color.dark_green,
+                pygame.draw.line(self.win, Color.grid,
                                  (col_idx*self.gap, 0), (col_idx*self.gap, self.width))
 
     def get_clicked_pos(self, pos) -> tuple():
@@ -138,5 +140,11 @@ class Model:
                 if neighbour.cell_type == CellType.TREE:
                     neighbour.make_fire()
                     new_generation.add(neighbour)
-            cell.make_burned()
+            cell.wood -= 0.25
+            cell.burned_wood += 0.25
+            if cell.wood <= 0:
+                cell.make_burned()
+            else:
+                cell.make_fire()
+                new_generation.add(cell)
         self.cells_on_fire = new_generation
