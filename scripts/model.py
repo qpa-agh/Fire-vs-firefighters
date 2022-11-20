@@ -17,7 +17,7 @@ class Model:
         self.grid = [[Cell(j, i)
                       for i in range(cells_x)] for j in range(cells_y)]
         self.update_neigbours()
-        self.generate_random_forest()
+        self.generate_random_forest(20000)
 
     def generate_random_forest(self, trees=None):
         if not trees:
@@ -140,8 +140,13 @@ class Model:
         for cell in self.cells_on_fire:
             for key, neighbour in cell.neighbours.items():
                 if neighbour.cell_type == CellType.TREE:
-                    neighbour.make_fire()
-                    new_generation.add(neighbour)
+                    if key in [1,3,5,7]: # corners
+                        if random.random() < 0.5:
+                            neighbour.make_fire()
+                            new_generation.add(neighbour)
+                    else:
+                        neighbour.make_fire()
+                        new_generation.add(neighbour)
             cell.wood -= 0.25
             cell.burned_wood += 0.25
             if cell.wood <= 0:
