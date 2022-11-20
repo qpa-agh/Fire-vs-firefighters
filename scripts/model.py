@@ -19,7 +19,9 @@ class Model:
         self.update_neigbours()
         self.generate_random_forest()
 
-    def generate_random_forest(self, trees=8000):
+    def generate_random_forest(self, trees=None):
+        if not trees:
+            trees = int(self.cells_y * self.cells_x * 0.8)
         random_list = random.sample(
             range(0, self.cells_y*self.cells_x - 1), trees)
         for nr in random_list:
