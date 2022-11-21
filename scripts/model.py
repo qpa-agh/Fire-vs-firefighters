@@ -6,7 +6,7 @@ import random
 
 class Model:
     def __init__(self, cells_y, cells_x, width):
-        self.win = pygame.display.set_mode((width, width))
+        self.win = pygame.display.set_mode((width + 100, width ))
         self.cells_y = cells_y       # nr of rows
         self.cells_x = cells_x       # nr of columns
         self.width = width           # display width
@@ -35,16 +35,6 @@ class Model:
         for row in self.grid:
             for cell in row:
                 cell.visual.draw()
-        self.draw_grid()
-
-    def draw_grid(self):
-        """Draws square grid."""
-        for row_idx in range(self.cells_y):
-            pygame.draw.line(self.win, Color.grid,
-                             (0, row_idx * self.gap), (self.width, row_idx*self.gap))
-            for col_idx in range(self.cells_y):
-                pygame.draw.line(self.win, Color.grid,
-                                 (col_idx*self.gap, 0), (col_idx*self.gap, self.width))
 
     def get_clicked_pos(self, pos) -> tuple():
         """Returns row and columns idx of clicked place."""
