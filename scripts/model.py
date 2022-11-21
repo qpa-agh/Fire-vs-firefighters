@@ -1,17 +1,19 @@
 from cell import *
 from colors import *
+from button import *
 import pygame
 import random
 
 
 class Model:
     def __init__(self, cells_y, cells_x, width):
-        self.win = pygame.display.set_mode((width + 100, width ))
+        self.win = pygame.display.set_mode((width + 100, width))
         self.cells_y = cells_y       # nr of rows
         self.cells_x = cells_x       # nr of columns
         self.width = width           # display width
         self.gap = width // cells_y  # width of the spot
         self.cells_on_fire = set()
+        self.wind_direction = None # str   
 
         Spot.set_parameters(self.gap, self.win)
         self.grid = [[Cell(j, i)
@@ -25,9 +27,9 @@ class Model:
         random_list = random.sample(
             range(0, self.cells_y*self.cells_x - 1), trees)
         for nr in random_list:
-            self.grid[nr//self.cells_x][nr % self.cells_x].wood = random.randint(1, 5)
+            self.grid[nr//self.cells_x][nr %
+                                        self.cells_x].wood = random.randint(1, 5)
             self.grid[nr//self.cells_x][nr % self.cells_x].make_tree()
-            
 
     def draw(self):
         """Draws square grid with colored spots."""
@@ -45,6 +47,8 @@ class Model:
 
     def animate(self):
         pygame.display.set_caption("Fire figters vs fire")
+        buttonHandler = ButtonHandler(
+            ["north", "south", "east", "west"], self.width + 10)
         run = True
         animation_started = False
         while run:
@@ -60,6 +64,10 @@ class Model:
                         # if pos is within the model.visual
                         if row < self.cells_y and col < self.cells_x:
                             self.make_spot_fire(row, col)
+                        else: # check pushing button
+                            y, x = pos
+                            self.wind_direction = buttonHandler.click_proper_button(x,y)
+                            print("wind direction changed:", self.wind_direction)
 
                     elif pygame.mouse.get_pressed()[2]:  # RIGHT
                         pos = pygame.mouse.get_pos()
@@ -71,13 +79,14 @@ class Model:
                         if event.key == pygame.K_SPACE:
                             animation_started = True
 
-                        if event.key == pygame.K_c: # reset
+                        if event.key == pygame.K_c:  # reset
                             self.reset_model()
             if animation_started:
                 self.spread_fire()
                 if not self.cells_on_fire:
                     animation_started = False
 
+            buttonHandler.draw_all_buttons(self.win)
             pygame.display.update()
         pygame.quit()
 
@@ -85,7 +94,7 @@ class Model:
         if self.grid[row][col].cell_type == CellType.TREE:
             self.grid[row][col].make_fire()
             self.cells_on_fire.add(self.grid[row][col])
-    
+
     def reset_spot(self, row, col):
         if self.grid[row][col].cell_type == CellType.FIRE:
             self.grid[row][col].make_tree()
@@ -130,7 +139,7 @@ class Model:
         for cell in self.cells_on_fire:
             for key, neighbour in cell.neighbours.items():
                 if neighbour.cell_type == CellType.TREE:
-                    if key in [1,3,5,7]: # corners
+                    if key in [1, 3, 5, 7]:  # corners
                         if random.random() < 0.5:
                             neighbour.make_fire()
                             new_generation.add(neighbour)
