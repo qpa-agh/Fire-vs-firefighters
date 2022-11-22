@@ -14,7 +14,7 @@ class Model:
         Spot.set_parameters(self.gap)
 
         self.cells_on_fire = set()
-        self.wind_direction = None # WindDirection 
+        self.wind_direction = None  # WindDirection
 
         self.grid = [[Cell(j, i)
                       for i in range(cells_x)] for j in range(cells_y)]
@@ -30,7 +30,6 @@ class Model:
             self.grid[nr//self.cells_x][nr %
                                         self.cells_x].wood = random.randint(1, 5)
             self.grid[nr//self.cells_x][nr % self.cells_x].make_tree()
-        
 
     def make_spot_fire(self, row, col):
         if self.grid[row][col].cell_type == CellType.TREE:
@@ -58,7 +57,7 @@ class Model:
 
                     # top
                     cell.neighbours[1] = self.grid[row_idx-1][col_idx]
-                    
+
                     # right top corner
                     if col_idx < self.cells_x - 1:
                         cell.neighbours[2] = self.grid[row_idx-1][col_idx+1]
@@ -74,11 +73,10 @@ class Model:
 
                     # bottom
                     cell.neighbours[5] = self.grid[row_idx+1][col_idx]
-                    
+
                     # left bottom corner
                     if col_idx > 0:
                         cell.neighbours[6] = self.grid[row_idx+1][col_idx-1]
-                                # left
+                        # left
                 if col_idx > 0:
                     cell.neighbours[7] = self.grid[row_idx][col_idx-1]
-

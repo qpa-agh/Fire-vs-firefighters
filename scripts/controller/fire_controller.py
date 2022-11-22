@@ -1,8 +1,4 @@
-
-
-
 import random
-from controller.simulation_status import SimulationStatus
 from model.cell import CellType
 from model.model import Model
 
@@ -16,19 +12,19 @@ class FireController:
         self.wind_negative_modifier = 0.25
         self.wind_close_negative_modifier = 0.5
 
-    def spread_fire(self, model: Model, simulation_status: SimulationStatus) -> bool:
-        if simulation_status.animation_started:
-            
+    def spread_fire(self, model: Model, animation_started: bool) -> bool:
+        if animation_started:
             new_generation = set()
             for cell in model.cells_on_fire:
                 for key, neighbour in cell.neighbours.items():
                     if neighbour.cell_type == CellType.TREE:
-                        wind_factor = self.__get_wind_factor(model.wind_direction, key)
-                        print(wind_factor, model.wind_direction, key)
+                        wind_factor = self.__get_wind_factor(
+                            model.wind_direction, key)
                         roll = random.random()
                         is_new_fire = roll <= self.fire_chance * \
                             wind_factor * \
-                            (self.diagonal_fire_modifier if key in [1, 3, 5, 7] else 1) 
+                            (self.diagonal_fire_modifier if key in [
+                             1, 3, 5, 7] else 1)
 
                         if is_new_fire:  # corners
                             neighbour.make_fire()
@@ -43,9 +39,10 @@ class FireController:
                     new_generation.add(cell)
             model.cells_on_fire = new_generation
 
-
             if not model.cells_on_fire:
-                simulation_status.animation_started = False
+                animation_started = False
+
+        return animation_started
 
     def __get_wind_factor(self, wind_dir, neigh_dir):
         if wind_dir is None or neigh_dir is None:
@@ -63,5 +60,3 @@ class FireController:
         elif opposite_wind_dir == left_neigh_dir or opposite_wind_dir == right_neigh_dir:
             return self.wind_close_negative_modifier
         return 1
-        
-        

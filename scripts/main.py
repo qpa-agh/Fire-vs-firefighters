@@ -8,7 +8,6 @@ def main(width, rows):
     simulation = SimulationController(model)
     simulation.run()
 
-
 if __name__ == '__main__':
     WIDTH, ROWS = loadParameters()
     main(WIDTH, ROWS)
