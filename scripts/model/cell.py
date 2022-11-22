@@ -1,4 +1,4 @@
-from spot import Spot
+from view.spot import Spot
 from enum import Enum
 
 
