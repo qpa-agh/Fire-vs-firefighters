@@ -4,6 +4,7 @@ from view.colors import Color
 
 class Button:
     """Representation of button displayed next to the grid."""
+    window = None
 
     def __init__(self, name, value, start_x, start_y) -> None:
         self.size_y = 30
@@ -22,15 +23,14 @@ class Button:
             return False
         return True
 
-    def draw(self, win):
+    def draw(self):
         """Draws square button with its name."""
-        pygame.draw.rect(win, self.color, [
+        pygame.draw.rect(Button.window, self.color, [
                          self.start_x, self.start_y, self.size_x, self.size_y])
-
         # text
         smallfont = pygame.font.SysFont('Verdana', 16)
         text = smallfont.render(self.name, True, Color.black)
-        win.blit(text, (self.start_x + 12, self.start_y + 5))
+        Button.window.blit(text, (self.start_x + 12, self.start_y + 5))
 
     def is_pushed(self):
         """Checks if button is pushed."""
@@ -49,3 +49,8 @@ class Button:
 
     def get_value(self):
         return self.value
+
+    @staticmethod
+    def set_window(window):
+        """Sets global parameters for all dots."""
+        Button.window = window

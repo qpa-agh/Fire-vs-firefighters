@@ -11,7 +11,7 @@ class Model:
 
         self.width = width           # display width
         self.gap = width // cells_y  # width of the spot
-        Spot.set_parameters(self.gap)
+        Spot.set_width(self.gap)
 
         self.cells_on_fire = set()
         self.wind_direction = None  # WindDirection

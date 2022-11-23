@@ -25,7 +25,7 @@ class SimulationController:
         self.animation_started = False
         self.run = True
 
-    def run(self) -> None:
+    def run_simulation(self) -> None:
         pygame.init()
         self.view_controller.draw_buttons(self.button_handler)
         while self.run:

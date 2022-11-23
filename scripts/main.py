@@ -6,7 +6,7 @@ from model.model import Model
 def main(width, rows):
     model = Model(rows, rows, width)
     simulation = SimulationController(model)
-    simulation.run()
+    simulation.run_simulation()
 
 if __name__ == '__main__':
     WIDTH, ROWS = loadParameters()

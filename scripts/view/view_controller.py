@@ -1,5 +1,6 @@
 import pygame
 from model.model import Model
+from view.button import Button
 from view.spot import Spot
 from view.button_handler import ButtonHandler
 from view.colors import Color
@@ -8,6 +9,8 @@ from view.colors import Color
 class ViewController:
     def __init__(self, width) -> None:
         self.win = pygame.display.set_mode((width + 100, width))
+        Spot.set_window(self.win)
+        Button.set_window(self.win)
         pygame.display.set_caption("Fire figters vs fire")
         self.win.fill(Color.grass_green)
 
@@ -15,12 +18,12 @@ class ViewController:
         """Draws square grid with colored spots."""
         for row in model.grid:
             for cell in row:
-                cell.visual.draw(self.win)
+                cell.visual.draw()
 
     def draw_buttons(self, button_handler: ButtonHandler):
         """Draws all buttons from list."""
         for button in button_handler.buttons:
-            button.draw(self.win)
+            button.draw()
 
     def update(self):
         pygame.display.update()
