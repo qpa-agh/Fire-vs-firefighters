@@ -5,26 +5,26 @@ from model.wind_data import WindDirection
 from view.button_handler import ButtonHandler
 from view.view_controller import ViewController
 
-BUTTON_LIST = [("NW", WindDirection.NW),
-               ("N", WindDirection.N),
-               ("NE", WindDirection.NE),
-               ("E", WindDirection.E),
-               ("SE", WindDirection.SE),
-               ("S", WindDirection.S),
-               ("SW", WindDirection.SW),
-               ("W", WindDirection.W)]
-
 
 class SimulationController:
     def __init__(self, model: Model) -> None:
         self.model = model
+        self.BUTTON_LIST = [("NW", WindDirection.NW, (self.model.width + 25,self.model.width - 190)),
+               ("N", WindDirection.N,  (self.model.width + 94,self.model.width - 215)),
+               ("NE", WindDirection.NE,  (self.model.width + 145,self.model.width - 190),),
+               ("E", WindDirection.E, (self.model.width + 180,self.model.width - 125),),
+               ("SE", WindDirection.SE, (self.model.width + 145,self.model.width - 60)),
+               ("S", WindDirection.S, (self.model.width + 94,self.model.width - 35)),
+               ("SW", WindDirection.SW,  (self.model.width + 25,self.model.width - 60)),
+               ("W", WindDirection.W,  (self.model.width + 5,self.model.width - 125))]
+
         self.button_handler = ButtonHandler(
-            BUTTON_LIST, model.width + 10)
+            self.BUTTON_LIST, model.width + 10)
         self.view_controller = ViewController(self.model.width)
         self.fire_controller = FireController()
         self.animation_started = False
         self.run = True
-
+        
     def run_simulation(self) -> None:
         pygame.init()
         self.view_controller.draw_buttons(self.button_handler)

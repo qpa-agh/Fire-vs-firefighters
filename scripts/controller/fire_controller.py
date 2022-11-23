@@ -25,7 +25,7 @@ class FireController:
                             wind_factor * \
                             (self.diagonal_fire_modifier if key in [
                              1, 3, 5, 7] else 1)
-                        if is_new_fire: 
+                        if is_new_fire:
                             neighbour.make_fire()
                             new_generation.add(neighbour)
 

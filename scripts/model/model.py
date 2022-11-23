@@ -22,8 +22,8 @@ class Model:
         self.generate_random_forest(20000)
 
     def generate_random_forest(self, trees=None):
-        if not trees:
-            trees = int(self.cells_y * self.cells_x * 0.8)
+        if not trees or trees > self.cells_y * self.cells_x:
+            trees = int(self.cells_y * self.cells_x * 0.7)
         random_list = random.sample(
             range(0, self.cells_y*self.cells_x - 1), trees)
         for nr in random_list:
@@ -45,7 +45,7 @@ class Model:
         self.grid = [[Cell(j, i)
                       for i in range(self.cells_x)] for j in range(self.cells_y)]
         self.update_neigbours()
-        self.generate_random_forest()
+        self.generate_random_forest(20000)
 
     def update_neigbours(self):
         for row_idx, row in enumerate(self.grid):

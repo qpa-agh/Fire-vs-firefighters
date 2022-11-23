@@ -9,11 +9,10 @@ class ButtonHandler:
         self.buttons = self.createButtons(button_names_and_values)
 
     def createButtons(self, button_names_and_values):
-        padding = 50
         buttons = []
-        for name, value in button_names_and_values:
-            button = Button(name, value, self.start_x, padding)
-            padding += 50
+        for name, value, pos in button_names_and_values:
+            button = Button(name, value, pos)
+            print(name, pos)
             buttons.append(button)
         return buttons
 
