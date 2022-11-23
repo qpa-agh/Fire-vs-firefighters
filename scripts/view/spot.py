@@ -1,11 +1,11 @@
-from colors import Color
+from view.colors import Color
 import pygame
 
 
 class Spot:
     """Representation of the pixel on a grid."""
     width = None  # spots width = gap between 2 lines
-    win = None
+    window = None
 
     def __init__(self, row, col) -> None:
         self.row = row
@@ -22,7 +22,7 @@ class Spot:
     def draw(self):
         """Draw the square with proper color and standaralized size."""
         pygame.draw.rect(
-            Spot.win, self.color, (self.x, self.y, Spot.width, Spot.width))
+            Spot.window, self.color, (self.y, self.x, Spot.width, Spot.width))
 
     def make_fire(self, wood, burned_wood):
         stage = burned_wood/(burned_wood + wood) * 6
@@ -39,7 +39,11 @@ class Spot:
         self.color = Color.tree[wood-1]
 
     @staticmethod
-    def set_parameters(width_, win):
+    def set_width(width):
         """Sets global parameters for all dots."""
-        Spot.width = width_
-        Spot.win = win
+        Spot.width = width
+
+    @staticmethod
+    def set_window(window):
+        """Sets global parameters for all dots."""
+        Spot.window = window

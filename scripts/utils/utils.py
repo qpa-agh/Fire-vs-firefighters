@@ -1,5 +1,6 @@
 import json
 
+
 def loadParameters():
     """Load parameters from config file."""
     f = open('./config/config.json')
