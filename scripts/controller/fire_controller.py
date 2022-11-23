@@ -25,8 +25,7 @@ class FireController:
                             wind_factor * \
                             (self.diagonal_fire_modifier if key in [
                              1, 3, 5, 7] else 1)
-
-                        if is_new_fire:  # corners
+                        if is_new_fire: 
                             neighbour.make_fire()
                             new_generation.add(neighbour)
 
@@ -37,11 +36,10 @@ class FireController:
                 else:
                     cell.make_fire()
                     new_generation.add(cell)
-            model.cells_on_fire = new_generation
 
+            model.cells_on_fire = new_generation
             if not model.cells_on_fire:
                 animation_started = False
-
         return animation_started
 
     def __get_wind_factor(self, wind_dir, neigh_dir):
