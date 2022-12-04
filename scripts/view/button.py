@@ -53,9 +53,6 @@ class Button:
         """Set button as not pushed."""
         self.color = Color.button
 
-    def get_name(self):
-        return self.name
-
     def get_value(self):
         return self.value
 

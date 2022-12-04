@@ -9,14 +9,20 @@ from view.view_controller import ViewController
 class SimulationController:
     def __init__(self, model: Model) -> None:
         self.model = model
-        self.BUTTON_LIST = [("NW", WindDirection.NW, (self.model.width + 25,self.model.width - 190)),
-               ("N", WindDirection.N,  (self.model.width + 94,self.model.width - 215)),
-               ("NE", WindDirection.NE,  (self.model.width + 145,self.model.width - 190),),
-               ("E", WindDirection.E, (self.model.width + 180,self.model.width - 125),),
-               ("SE", WindDirection.SE, (self.model.width + 145,self.model.width - 60)),
-               ("S", WindDirection.S, (self.model.width + 94,self.model.width - 35)),
-               ("SW", WindDirection.SW,  (self.model.width + 25,self.model.width - 60)),
-               ("W", WindDirection.W,  (self.model.width + 5,self.model.width - 125))]
+        self.BUTTON_LIST = [("NW", WindDirection.NW, (self.model.width + 25, self.model.width - 190)),
+                            ("N", WindDirection.N,
+                             (self.model.width + 94, self.model.width - 215)),
+                            ("NE", WindDirection.NE,
+                             (self.model.width + 145, self.model.width - 190),),
+                            ("E", WindDirection.E, (self.model.width +
+                             180, self.model.width - 125),),
+                            ("SE", WindDirection.SE,
+                             (self.model.width + 145, self.model.width - 60)),
+                            ("S", WindDirection.S,
+                             (self.model.width + 94, self.model.width - 35)),
+                            ("SW", WindDirection.SW,
+                             (self.model.width + 25, self.model.width - 60)),
+                            ("W", WindDirection.W,  (self.model.width + 5, self.model.width - 125))]
 
         self.button_handler = ButtonHandler(
             self.BUTTON_LIST, model.width + 10)
@@ -24,7 +30,7 @@ class SimulationController:
         self.fire_controller = FireController()
         self.animation_started = False
         self.run = True
-        
+
     def run_simulation(self) -> None:
         pygame.init()
         self.view_controller.draw_buttons(self.button_handler)
@@ -52,7 +58,6 @@ class SimulationController:
                     x, y = pos
                     self.model.wind_direction = self.button_handler.click_proper_button(
                         x, y)
-                    print("wind direction changed:", self.model.wind_direction)
                     self.view_controller.draw_buttons(self.button_handler)
 
             elif pygame.mouse.get_pressed()[2]:  # RIGHT

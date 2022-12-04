@@ -20,14 +20,19 @@ class ViewController:
         for row in model.grid:
             for cell in row:
                 cell.visual.draw()
-        self.display_compass()
+        self.draw_compass()
 
     def draw_buttons(self, button_handler: ButtonHandler):
         """Draws all buttons from list."""
         for button in button_handler.buttons:
             button.draw()
-        self.display_compass()
-        # self.display_directions()
+        self.draw_compass()
+    
+    def draw_compass(self):
+        """Draws compass image."""
+        imp = pygame.image.load(
+            "scripts\img\compass_small.png").convert_alpha()
+        self.win.blit(imp, (self.width + 25, self.width - 190))
 
     def update(self):
         pygame.display.update()
@@ -38,23 +43,3 @@ class ViewController:
         row = y // Spot.width
         col = x // Spot.width
         return row, col
-    
-    def display_compass(self):
-        imp = pygame.image.load("scripts\img\compass_small.png").convert_alpha()
-        self.win.blit(imp, (self.width + 25, self.width - 190))
-    
-    def display_directions(self):
-        smallfont = pygame.font.SysFont('Verdana', 17)
-        labels_to_pos = {
-            "N": (self.width + 94,self.width - 215),
-            "S": (self.width + 94,self.width - 35),
-            "W": (self.width + 5,self.width - 125),
-            "E": (self.width + 180,self.width - 125),
-            "NW": (self.width + 25,self.width - 190),
-            "NE": (self.width + 145,self.width - 190),
-            "SE": (self.width + 145,self.width - 60),
-            "SW": (self.width + 25,self.width - 60),
-        }
-        for label, pos in labels_to_pos.items():
-            text = smallfont.render(label, True, Color.black)
-            self.win.blit(text, pos)

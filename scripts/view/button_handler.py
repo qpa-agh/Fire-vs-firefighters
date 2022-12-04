@@ -12,7 +12,6 @@ class ButtonHandler:
         buttons = []
         for name, value, pos in button_names_and_values:
             button = Button(name, value, pos)
-            print(name, pos)
             buttons.append(button)
         return buttons
 
