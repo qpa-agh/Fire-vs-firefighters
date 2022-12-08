@@ -6,8 +6,13 @@ import random
 
 class Model:
     def __init__(self, cells_y, cells_x, width):
+        assert cells_y % 10 == 0
+        assert cells_x % 10 == 0
         self.cells_y = cells_y       # nr of rows
         self.cells_x = cells_x       # nr of columns
+
+        self.sectors_y = cells_y // 10
+        self.sectors_x = cells_x // 10
 
         self.width = width           # display width
         self.gap = width // cells_y  # width of the spot
@@ -19,17 +24,32 @@ class Model:
         self.grid = [[Cell(j, i)
                       for i in range(cells_x)] for j in range(cells_y)]
         self.update_neigbours()
-        self.generate_random_forest(20000)
+        self.sectors = []
+        self.generate_random_forest()
 
-    def generate_random_forest(self, trees=None):
-        if not trees or trees > self.cells_y * self.cells_x:
-            trees = int(self.cells_y * self.cells_x * 0.7)
+    def generate_random_forest(self): # TODO sectors from argument
+        tree_sectors = int(self.sectors_y * self.sectors_x * 0.8)
         random_list = random.sample(
-            range(0, self.cells_y*self.cells_x - 1), trees)
-        for nr in random_list:
-            self.grid[nr//self.cells_x][nr %
-                                        self.cells_x].wood = random.randint(1, 5)
-            self.grid[nr//self.cells_x][nr % self.cells_x].make_tree()
+            range(self.sectors_y * self.sectors_x - 1), tree_sectors)
+        for sector_y in range(self.sectors_y):
+            row = []
+            for sector_x in range(self.sectors_x):
+                sector = sector_y * self.sectors_x + sector_x
+                if sector in random_list:
+                    row.append(SectorType.TREES)
+                else:
+                    row.append(SectorType.GRASS)
+            self.sectors.append(row)
+
+        for y, row in enumerate(self.grid):
+            for x, cell in enumerate(row):
+                sectorTree = (y//10 * self.sectors_x + x//10) in random_list
+                cell.sector = SectorType.TREES if sectorTree else SectorType.GRASS
+                isTree = random.random() <= (0.7 if sectorTree else 0.2)
+                if isTree:
+                    cell.wood = random.randint(20, 100)
+                    cell.make_tree()
+
 
     def make_spot_fire(self, row, col):
         if self.grid[row][col].cell_type == CellType.TREE:

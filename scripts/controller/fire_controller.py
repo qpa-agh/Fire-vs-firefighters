@@ -5,7 +5,7 @@ from model.model import Model
 
 class FireController:
     def __init__(self) -> None:
-        self.fire_chance = 0.3
+        self.fire_chance = 0.01
         self.diagonal_fire_modifier = 0.7
         self.wind_positive_modifier = 4
         self.wind_close_positive_modifier = 2

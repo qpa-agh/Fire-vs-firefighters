@@ -1,5 +1,7 @@
+from enum import Enum
 import pygame
 from model.model import Model
+from utils.enums import ViewType
 from view.button import Button
 from view.spot import Spot
 from view.button_handler import ButtonHandler
@@ -14,12 +16,14 @@ class ViewController:
         Button.set_window(self.win)
         pygame.display.set_caption("Fire figters vs fire")
         self.win.fill(Color.white)
+        self.view_type = ViewType.CELL
 
     def draw_model(self, model: Model):
         """Draws square grid with colored spots."""
         for row in model.grid:
             for cell in row:
-                cell.visual.draw()
+                cell.visual.draw(self.view_type, cell.sector)
+                
         self.draw_compass()
 
     def draw_buttons(self, button_handler: ButtonHandler):
