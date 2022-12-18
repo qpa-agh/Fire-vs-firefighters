@@ -27,6 +27,9 @@ class Model:
         self.sectors = []
         self.generate_random_forest()
 
+        self.wood_burned_per_frame = 0.05
+        self.burning_spread_per_frame = 0.25
+
     def generate_random_forest(self):
         trees_ratio = 0.8
         grass_ratio = 0.1
@@ -54,7 +57,7 @@ class Model:
 
     def make_spot_fire(self, row, col):
         if self.grid[row][col].is_tree():
-            self.grid[row][col].make_fire()
+            self.grid[row][col].make_fire(self.burning_spread_per_frame)
             self.cells_on_fire.add(self.grid[row][col])
 
     def reset_spot(self, row, col):

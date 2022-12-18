@@ -39,8 +39,8 @@ class Spot:
             pygame.draw.rect(
                 Spot.window, col, (self.y, self.x, Spot.width, Spot.width))
 
-    def make_fire(self, wood, burned_wood):
-        stage = int(burned_wood/(burned_wood + wood) * len(Color.fire))
+    def make_fire(self, wood, burning_wood, burned_wood):
+        stage = int(burning_wood/(burning_wood + burned_wood + wood) * len(Color.fire))
         if stage >= len(Color.fire):
             stage -= 1
         self.color = Color.fire[stage]

@@ -19,9 +19,12 @@ class Cell:
         self.cell_type == CellType.WATER
         self.visual.make_water()
 
-    def make_fire(self):
+    def make_fire(self, spread_per_frame):
         self.cell_type = CellType.FIRE
-        self.visual.make_fire(self.wood, self.burned_wood)
+        if self.wood > 0:
+            self.wood -= spread_per_frame
+            self.burning_wood +=  spread_per_frame
+        self.visual.make_fire(self.wood, self.burning_wood, self.burned_wood)
 
     def make_tree(self):
         self.cell_type = CellType.TREE
@@ -35,13 +38,13 @@ class Cell:
     def has_wood_to_burn(self) -> bool:
         return self.wood + self.burning_wood > 0
 
-    def burn_wood(self, wood_to_burn: float) -> None:
-        self.wood -= wood_to_burn
+    def burn_wood(self, wood_to_burn: float, spread_per_frame: float) -> None:
+        self.burning_wood -= wood_to_burn
         self.burned_wood += wood_to_burn
         if self.wood + self.burning_wood <= 0:
             self.make_burned()
         else:
-            self.make_fire()
+            self.make_fire(spread_per_frame)
 
     def is_on_fire(self):
         return self.cell_type == CellType.FIRE

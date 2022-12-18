@@ -40,7 +40,7 @@ class ViewController:
     
     def draw_time(self, iteration):
         pygame.draw.rect(Button.window, Color.white, [
-                        self.width + 25, self.width - 300, 100, 20])
+                        self.width + 25, self.width - 300, 180, 20])
         smallfont = pygame.font.SysFont('Verdana', 16)
         text = smallfont.render("Time: " + str(iteration), True, Color.black)
         Button.window.blit(text, (self.width + 25, self.width - 300))

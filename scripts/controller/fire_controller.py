@@ -2,17 +2,15 @@ import random
 from model.model import Model
 
 class WindModifier:
-    positive = 4
-    close_positive = 2
-    negative = 0.25
-    close_negative = 0.5
+    positive = 0.04
+    close_positive = 0.02
+    negative = 0.0025
+    close_negative = 0.005
 
 
 class FireController:
     def __init__(self) -> None:
-        self.fire_chance = 0.01
         self.diagonal_fire_modifier = 0.7
-        self.wood_burned_per_frame = 0.25
         self.diagonal_keys = set({1, 3, 5, 7})
 
     def spread_fire(self, model: Model, animation_started: bool) -> bool:
@@ -26,11 +24,12 @@ class FireController:
                     wind_modifier = self.__get_wind_modifier(
                         model.wind_direction, key)
                     diagonal_modifier = self.diagonal_fire_modifier if key in self.diagonal_keys else 1
-                    if random.random() <= self.fire_chance * wind_modifier * diagonal_modifier:
-                        neighbour.make_fire()
+                    wood_factor = cell.burning_wood/100 # how much wood is burning
+                    if random.random() <= wind_modifier * diagonal_modifier * wood_factor:
+                        neighbour.make_fire(model.burning_spread_per_frame)
                         new_generation.add(neighbour)
 
-            cell.burn_wood(self.wood_burned_per_frame)
+            cell.burn_wood(model.wood_burned_per_frame, model.burning_spread_per_frame)
             if cell.has_wood_to_burn():
                 new_generation.add(cell)
 
