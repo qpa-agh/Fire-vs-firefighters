@@ -1,14 +1,5 @@
+from utils.enums import CellType, SectorType
 from view.spot import Spot
-from enum import Enum
-
-
-class CellType(Enum):
-    GROUND = 0,
-    TREE = 1,
-    FIRE = 2,
-    BURNED = 3,
-    GRASS = 4
-
 
 class Cell:
     def __init__(self, row: int, col: int, cell_type: CellType = CellType.GROUND):
@@ -17,8 +8,9 @@ class Cell:
         self.col = col
         self.visual = Spot(row, col)
         self.neighbours = {}  # neighbor idx to cell
-        self.wood = 0  # if tree -> random from 1 to 5
+        self.wood = 0  # if tree -> random from 20 to 100
         self.burned_wood = 0
+        self.sector = -1
 
     def make_fire(self):
         self.cell_type = CellType.FIRE
