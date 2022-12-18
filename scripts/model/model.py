@@ -47,17 +47,17 @@ class Model:
                 cell.sector = SectorType.TREES if sectorTree else SectorType.GRASS
                 isTree = random.random() <= (0.7 if sectorTree else 0.2)
                 if isTree:
-                    cell.wood = random.randint(20, 100)
+                    cell.wood = random.randint(20, 99)
                     cell.make_tree()
 
 
     def make_spot_fire(self, row, col):
-        if self.grid[row][col].cell_type == CellType.TREE:
+        if self.grid[row][col].is_tree():
             self.grid[row][col].make_fire()
             self.cells_on_fire.add(self.grid[row][col])
 
     def reset_spot(self, row, col):
-        if self.grid[row][col].cell_type == CellType.FIRE:
+        if self.grid[row][col].is_on_fire():
             self.grid[row][col].make_tree()
             self.cells_on_fire.remove(self.grid[row][col])
 

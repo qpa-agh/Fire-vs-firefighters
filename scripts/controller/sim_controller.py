@@ -39,7 +39,7 @@ class SimulationController:
         self.view_controller.draw_buttons(self.button_handler)
         while self.run:
             if self.animation_started:
-                print(self.iteration)
+                # print(self.iteration)
                 self.iteration += 1
             self.view_controller.draw_model(self.model)
             for event in pygame.event.get():

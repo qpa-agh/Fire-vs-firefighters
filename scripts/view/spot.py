@@ -31,15 +31,13 @@ class Spot:
                 Spot.window, col, (self.y, self.x, Spot.width, Spot.width))
 
     def make_fire(self, wood, burned_wood):
-        stage = burned_wood/(burned_wood + wood) * len(Color.fire)
-        self.color = Color.fire[int(stage)]
+        stage = int(burned_wood/(burned_wood + wood) * len(Color.fire))
+        if stage >= len(Color.fire):
+            stage -= 1
+        self.color = Color.fire[stage]
 
     def make_burned(self, burned_wood: int):
-        if burned_wood >= 1:
-            burned_wood -= 1
-        else:
-            burned_wood = 0
-        self.color = Color.burned[int(burned_wood//20)]
+        self.color = Color.burned[int(burned_wood-20)//20]
 
     def make_tree(self, wood: int):
         self.color = Color.tree[wood//20-1]

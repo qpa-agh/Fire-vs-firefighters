@@ -11,6 +11,7 @@ class FireController:
         self.wind_close_positive_modifier = 2
         self.wind_negative_modifier = 0.25
         self.wind_close_negative_modifier = 0.5
+        self.wood_burned_per_frame = 0.25
 
     def spread_fire(self, model: Model, animation_started: bool) -> bool:
         if animation_started:
@@ -29,12 +30,8 @@ class FireController:
                             neighbour.make_fire()
                             new_generation.add(neighbour)
 
-                cell.wood -= 0.25
-                cell.burned_wood += 0.25
-                if cell.wood <= 0:
-                    cell.make_burned()
-                else:
-                    cell.make_fire()
+                cell.burn_wood(self.wood_burned_per_frame)
+                if cell.has_wood_to_burn():
                     new_generation.add(cell)
 
             model.cells_on_fire = new_generation
