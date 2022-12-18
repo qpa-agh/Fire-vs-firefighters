@@ -1,5 +1,6 @@
 from utils.enums import CellType, SectorType
 from view.spot import Spot
+import random
 
 class Cell:
     def __init__(self, row: int, col: int, cell_type: CellType = CellType.GROUND):
@@ -11,6 +12,10 @@ class Cell:
         self.wood = 0  # if tree -> random from 20 to 100
         self.burned_wood = 0
         self.sector = -1
+    
+    def make_water(self):
+        self.cell_type == CellType.WATER
+        self.visual.make_water()
 
     def make_fire(self):
         self.cell_type = CellType.FIRE
@@ -18,6 +23,7 @@ class Cell:
 
     def make_tree(self):
         self.cell_type = CellType.TREE
+        self.wood = random.randint(20, 99)
         self.visual.make_tree(self.wood)
 
     def make_burned(self):

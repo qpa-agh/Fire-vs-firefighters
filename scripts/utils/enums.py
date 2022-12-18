@@ -5,11 +5,13 @@ class CellType(Enum):
     TREE = 1,
     FIRE = 2,
     BURNED = 3,
-    GRASS = 4
+    GRASS = 4,
+    WATER = 5
 
 class SectorType(Enum):
     GRASS = 0
     TREES = 1
+    WATER = 2
 
 class ViewType(Enum):
     CELL = 0

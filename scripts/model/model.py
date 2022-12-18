@@ -27,29 +27,30 @@ class Model:
         self.sectors = []
         self.generate_random_forest()
 
-    def generate_random_forest(self): # TODO sectors from argument
-        tree_sectors = int(self.sectors_y * self.sectors_x * 0.8)
-        random_list = random.sample(
-            range(self.sectors_y * self.sectors_x - 1), tree_sectors)
+    def generate_random_forest(self):
+        trees_ratio = 0.8
+        grass_ratio = 0.1
         for sector_y in range(self.sectors_y):
-            row = []
             for sector_x in range(self.sectors_x):
-                sector = sector_y * self.sectors_x + sector_x
-                if sector in random_list:
-                    row.append(SectorType.TREES)
+                rand = random.random()
+                sector = None
+                if rand < trees_ratio:
+                    sector = SectorType.TREES
+                elif rand < trees_ratio + grass_ratio:
+                    sector = SectorType.GRASS
                 else:
-                    row.append(SectorType.GRASS)
-            self.sectors.append(row)
-
+                    sector = SectorType.WATER
+                self.sectors.append(sector)
+        
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
-                sectorTree = (y//10 * self.sectors_x + x//10) in random_list
-                cell.sector = SectorType.TREES if sectorTree else SectorType.GRASS
-                isTree = random.random() <= (0.7 if sectorTree else 0.2)
-                if isTree:
-                    cell.wood = random.randint(20, 99)
+                sector_idx = (y//10 * self.sectors_x + x//10)
+                cell.sector = self.sectors[sector_idx]
+                if (cell.sector == SectorType.TREES and random.random() <= 0.7) \
+                    or (cell.sector == SectorType.GRASS and random.random() <= 0.2) :
                     cell.make_tree()
-
+                elif cell.sector == SectorType.WATER:
+                    cell.make_water()
 
     def make_spot_fire(self, row, col):
         if self.grid[row][col].is_tree():

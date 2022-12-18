@@ -29,7 +29,13 @@ class Spot:
             pygame.draw.rect(
                 Spot.window, self.color, (self.y, self.x, Spot.width, Spot.width))
         else:
-            col = Color.grass_green if sector == SectorType.GRASS else Color.tree[0]
+            col = None
+            if sector == SectorType.GRASS:
+                col = Color.grass_green
+            elif sector == SectorType.WATER:
+                col = Color.water
+            else:
+                col = Color.tree[0]
             pygame.draw.rect(
                 Spot.window, col, (self.y, self.x, Spot.width, Spot.width))
 
@@ -44,6 +50,9 @@ class Spot:
 
     def make_tree(self, wood: int):
         self.color = Color.tree[wood//20-1]
+    
+    def make_water(self):
+        self.color = Color.water
 
     @staticmethod
     def set_width(width):
