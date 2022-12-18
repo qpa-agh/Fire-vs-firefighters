@@ -14,29 +14,28 @@ class FireController:
         self.wood_burned_per_frame = 0.25
 
     def spread_fire(self, model: Model, animation_started: bool) -> bool:
-        if animation_started:
-            new_generation = set()
-            for cell in model.cells_on_fire:
-                for key, neighbour in cell.neighbours.items():
-                    if neighbour.cell_type == CellType.TREE:
-                        wind_factor = self.__get_wind_factor(
-                            model.wind_direction, key)
-                        roll = random.random()
-                        is_new_fire = roll <= self.fire_chance * \
-                            wind_factor * \
-                            (self.diagonal_fire_modifier if key in [
-                             1, 3, 5, 7] else 1)
-                        if is_new_fire:
-                            neighbour.make_fire()
-                            new_generation.add(neighbour)
+        if not animation_started:
+            return False
+            
+        new_generation = set()
+        for cell in model.cells_on_fire:
+            for key, neighbour in cell.neighbours.items():
+                if neighbour.is_tree():
+                    wind_factor = self.__get_wind_factor(
+                        model.wind_direction, key)
+                    diagonal_modifier = self.diagonal_fire_modifier if key in [
+                            1, 3, 5, 7] else 1
+                    if random.random() <= self.fire_chance * wind_factor * diagonal_modifier:
+                        neighbour.make_fire()
+                        new_generation.add(neighbour)
 
-                cell.burn_wood(self.wood_burned_per_frame)
-                if cell.has_wood_to_burn():
-                    new_generation.add(cell)
+            cell.burn_wood(self.wood_burned_per_frame)
+            if cell.has_wood_to_burn():
+                new_generation.add(cell)
 
-            model.cells_on_fire = new_generation
-            if not model.cells_on_fire:
-                animation_started = False
+        model.cells_on_fire = new_generation
+        if not model.cells_on_fire: # animation ended or not started
+            animation_started = False
         return animation_started
 
     def __get_wind_factor(self, wind_dir, neigh_dir):

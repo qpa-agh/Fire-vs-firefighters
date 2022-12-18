@@ -21,7 +21,10 @@ class Spot:
         return self.row, self.col
 
     def draw(self, viewType: ViewType, sector: SectorType):
-        """Draw the square with proper color and standaralized size."""
+        """
+        Draw the square with proper color and standaralized size in CELL mode, otherways
+        draws 10x10 squares.
+        """
         if viewType == ViewType.CELL:
             pygame.draw.rect(
                 Spot.window, self.color, (self.y, self.x, Spot.width, Spot.width))
