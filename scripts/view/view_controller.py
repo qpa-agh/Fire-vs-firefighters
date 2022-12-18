@@ -18,13 +18,13 @@ class ViewController:
         self.win.fill(Color.white)
         self.view_type = ViewType.CELL
 
-    def draw_model(self, model: Model):
+    def draw_model(self, model: Model, iteration):
         """Draws square grid with colored spots."""
         for row in model.grid:
             for cell in row:
                 cell.visual.draw(self.view_type, cell.sector)
-                
         self.draw_compass()
+        self.draw_time(iteration)
 
     def draw_buttons(self, button_handler: ButtonHandler):
         """Draws all buttons from list."""
@@ -37,6 +37,13 @@ class ViewController:
         imp = pygame.image.load(
             "scripts\img\compass_small.png").convert_alpha()
         self.win.blit(imp, (self.width + 25, self.width - 190))
+    
+    def draw_time(self, iteration):
+        pygame.draw.rect(Button.window, Color.white, [
+                        self.width + 25, self.width - 300, 100, 20])
+        smallfont = pygame.font.SysFont('Verdana', 16)
+        text = smallfont.render("Time: " + str(iteration), True, Color.black)
+        Button.window.blit(text, (self.width + 25, self.width - 300))
 
     def update(self):
         pygame.display.update()

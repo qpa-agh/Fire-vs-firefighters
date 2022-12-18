@@ -41,7 +41,7 @@ class SimulationController:
             if self.animation_started:
                 # print(self.iteration)
                 self.iteration += 1
-            self.view_controller.draw_model(self.model)
+            self.view_controller.draw_model(self.model, self.iteration)
             for event in pygame.event.get():
                 self.resolve_event(event)
             self.animation_started = self.fire_controller.spread_fire(
