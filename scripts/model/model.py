@@ -65,7 +65,7 @@ class Model:
         self.grid = [[Cell(j, i)
                       for i in range(self.cells_x)] for j in range(self.cells_y)]
         self.update_neigbours()
-        self.generate_random_forest(20000)
+        self.generate_random_forest()
 
     def update_neigbours(self):
         for row_idx, row in enumerate(self.grid):
