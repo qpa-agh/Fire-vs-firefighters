@@ -2,10 +2,11 @@ from model.cell import *
 from view.colors import *
 from view.button import *
 import random
+import cv2
 
 
 class Model:
-    def __init__(self, cells_y, cells_x, width):
+    def __init__(self, cells_y, cells_x, width, forest_map=None):
         assert cells_y % 10 == 0
         assert cells_x % 10 == 0
         self.cells_y = cells_y       # nr of rows
@@ -25,12 +26,29 @@ class Model:
                       for i in range(cells_x)] for j in range(cells_y)]
         self.update_neigbours()
         self.sectors = []
-        self.generate_random_forest()
+
+        if forest_map:
+            self.load_sectors_from_img()
+        else:
+            self.generate_random_forest()
+        
 
         self.tree_factor = 4
         self.wood_burned_per_frame = 0.05
         self.burning_spread_per_frame = 0.25
         self.water_evaporation_per_frame = 0.01
+    
+    def load_sectors_from_img(self):
+        I = cv2.imread('maps\map1.png', cv2.IMREAD_GRAYSCALE)
+        for y, row in enumerate(self.grid):
+            for x, cell in enumerate(row):
+                if I[y][x] == 255:
+                    cell.make_water()
+                elif I[y][x] > 200:
+                    if random.random() <= 0.1:
+                        cell.make_tree(4) #  self.tree_factor didn't work wtf
+                elif random.random() <= 0.7:
+                    cell.make_tree(4) #  self.tree_factor didn't work wtf
     
     def generate_sectors(self):
         trees_ratio = 0.8
