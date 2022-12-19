@@ -26,9 +26,9 @@ class Cell:
             self.burning_wood +=  spread_per_frame
         self.visual.make_fire(self.wood, self.burning_wood, self.burned_wood)
 
-    def make_tree(self):
+    def make_tree(self, tree_factor):
         self.cell_type = CellType.TREE
-        self.wood = random.randint(20, 99)
+        self.wood = random.randint(10, 25) * tree_factor
         self.visual.make_tree(self.wood)
 
     def make_burned(self):

@@ -27,8 +27,10 @@ class Model:
         self.sectors = []
         self.generate_random_forest()
 
+        self.tree_factor = 4
         self.wood_burned_per_frame = 0.05
         self.burning_spread_per_frame = 0.25
+        self.water_evaporation_per_frame = 0.01
 
     def generate_random_forest(self):
         trees_ratio = 0.8
@@ -51,7 +53,7 @@ class Model:
                 cell.sector = self.sectors[sector_idx]
                 if (cell.sector == SectorType.TREES and random.random() <= 0.7) \
                     or (cell.sector == SectorType.GRASS and random.random() <= 0.2) :
-                    cell.make_tree()
+                    cell.make_tree(4) #  self.tree_factor didn't work wtf
                 elif cell.sector == SectorType.WATER:
                     cell.make_water()
 
@@ -62,7 +64,7 @@ class Model:
 
     def reset_spot(self, row, col):
         if self.grid[row][col].is_on_fire():
-            self.grid[row][col].make_tree()
+            self.grid[row][col].make_tree(self.tree_factor)
             self.cells_on_fire.remove(self.grid[row][col])
 
     def reset_model(self):
