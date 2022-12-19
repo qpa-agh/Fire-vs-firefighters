@@ -31,8 +31,8 @@ class Model:
         self.wood_burned_per_frame = 0.05
         self.burning_spread_per_frame = 0.25
         self.water_evaporation_per_frame = 0.01
-
-    def generate_random_forest(self):
+    
+    def generate_sectors(self):
         trees_ratio = 0.8
         grass_ratio = 0.1
         for sector_y in range(self.sectors_y):
@@ -46,6 +46,9 @@ class Model:
                 else:
                     sector = SectorType.WATER
                 self.sectors.append(sector)
+
+    def generate_random_forest(self):
+        self.generate_sectors()
         
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):

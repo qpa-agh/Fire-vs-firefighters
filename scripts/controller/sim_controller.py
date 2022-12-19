@@ -61,10 +61,9 @@ class SimulationController:
                 self.animation_started = False
                 self.iteration = 0
             if event.key == pygame.K_z:  # change
-                self.view_controller.view_type = \
-                    ViewType.SECTOR \
-                    if self.view_controller.view_type == ViewType.CELL \
-                    else ViewType.CELL
+                self.view_controller.view_type = ViewType.MAP \
+                    if self.view_controller.view_type == ViewType.FIRE_FIGHTERS \
+                    else ViewType.FIRE_FIGHTERS
 
         if pygame.mouse.get_pressed()[0]:  # LEFT
             pos = pygame.mouse.get_pos()

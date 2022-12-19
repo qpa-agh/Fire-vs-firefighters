@@ -20,24 +20,12 @@ class Spot:
         """Returns idx of row and column of the object."""
         return self.row, self.col
 
-    def draw(self, viewType: ViewType, sector: SectorType):
+    def draw(self):
         """
         Draw the square with proper color and standaralized size in CELL mode, otherways
         draws 10x10 squares.
         """
-        if viewType == ViewType.CELL:
-            pygame.draw.rect(
-                Spot.window, self.color, (self.y, self.x, Spot.width, Spot.width))
-        else:
-            col = None
-            if sector == SectorType.GRASS:
-                col = Color.grass_green
-            elif sector == SectorType.WATER:
-                col = Color.water
-            else:
-                col = Color.tree[0]
-            pygame.draw.rect(
-                Spot.window, col, (self.y, self.x, Spot.width, Spot.width))
+        pygame.draw.rect( Spot.window, self.color, (self.y, self.x, Spot.width, Spot.width))
 
     def make_fire(self, wood, burning_wood, burned_wood):
         stage = int(burning_wood/(burning_wood + burned_wood + wood) * len(Color.fire))

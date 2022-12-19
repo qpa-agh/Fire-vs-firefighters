@@ -14,5 +14,5 @@ class SectorType(Enum):
     WATER = 2
 
 class ViewType(Enum):
-    CELL = 0
-    SECTOR = 1
+    MAP = 0,
+    FIRE_FIGHTERS = 1
