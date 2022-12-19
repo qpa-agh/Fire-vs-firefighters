@@ -13,11 +13,17 @@ class Cell:
         self.wood = 0  # if tree -> random from 20 to 100
         self.burning_wood = 0
         self.burned_wood = 0
-        self.sector = -1
+        self.sector = None
+        self.moisture = 0 # from 0 to 1
 
     def make_water(self):
         self.cell_type == CellType.WATER
         self.visual.make_water()
+    
+    def evaporate(self, water_evaporation_per_frame):
+        water = self.moisture * self.wood
+        water -= water_evaporation_per_frame
+        self.moisture = water/ self.wood
 
     def make_fire(self, spread_per_frame):
         self.cell_type = CellType.FIRE
@@ -28,6 +34,7 @@ class Cell:
 
     def make_tree(self, tree_factor):
         self.cell_type = CellType.TREE
+        self.moisture = 0.6
         self.wood = random.randint(10, 25) * tree_factor
         self.visual.make_tree(self.wood)
 

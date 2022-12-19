@@ -32,11 +32,17 @@ class Model:
         else:
             self.generate_random_forest()
         
-
+        # how huge impact has amount of burning wood on fire spread
         self.tree_factor = 4
+
+        # how much wood which is on fire will burn out per frame
         self.wood_burned_per_frame = 0.05
+
+        # how much wood will catch fire per frame
         self.burning_spread_per_frame = 0.25
-        self.water_evaporation_per_frame = 0.01
+
+        # how much water evaporates from wood per frame
+        self.water_evaporation_per_frame = 5
     
     def load_sectors_from_img(self):
         I = cv2.imread('maps\map1.png', cv2.IMREAD_GRAYSCALE)

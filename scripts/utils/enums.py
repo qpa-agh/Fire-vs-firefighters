@@ -6,7 +6,7 @@ class CellType(Enum):
     FIRE = 2,
     BURNED = 3,
     GRASS = 4,
-    WATER = 5
+    WATER = 5,
 
 class SectorType(Enum):
     GRASS = 0

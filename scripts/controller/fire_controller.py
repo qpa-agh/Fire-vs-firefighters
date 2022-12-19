@@ -28,8 +28,11 @@ class FireController:
                     diagonal_modifier = self.diagonal_fire_modifier if key in self.diagonal_keys else 1
                     wood_factor = cell.burning_wood/100  # how much wood is burning
                     if random.random() <= wind_modifier * diagonal_modifier * wood_factor:
-                        neighbour.make_fire(model.burning_spread_per_frame)
-                        new_generation.add(neighbour)
+                        if neighbour.moisture <= 0.3:
+                            neighbour.make_fire(model.burning_spread_per_frame)
+                            new_generation.add(neighbour)
+                        else:
+                            neighbour.evaporate(model.water_evaporation_per_frame)
 
             cell.burn_wood(model.wood_burned_per_frame,
                            model.burning_spread_per_frame)
