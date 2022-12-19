@@ -1,11 +1,13 @@
 import random
 from model.model import Model
 
+
 class WindModifier:
-    positive = 0.04
-    close_positive = 0.02
-    negative = 0.0025
-    close_negative = 0.005
+    positive = 1
+    close_positive = 0.7
+    negative = 0.05
+    close_negative = 0.15
+    no_wind = 0.5
 
 
 class FireController:
@@ -24,12 +26,13 @@ class FireController:
                     wind_modifier = self.__get_wind_modifier(
                         model.wind_direction, key)
                     diagonal_modifier = self.diagonal_fire_modifier if key in self.diagonal_keys else 1
-                    wood_factor = cell.burning_wood/100 # how much wood is burning
+                    wood_factor = cell.burning_wood/100  # how much wood is burning
                     if random.random() <= wind_modifier * diagonal_modifier * wood_factor:
                         neighbour.make_fire(model.burning_spread_per_frame)
                         new_generation.add(neighbour)
 
-            cell.burn_wood(model.wood_burned_per_frame, model.burning_spread_per_frame)
+            cell.burn_wood(model.wood_burned_per_frame,
+                           model.burning_spread_per_frame)
             if cell.has_wood_to_burn():
                 new_generation.add(cell)
 
@@ -53,4 +56,4 @@ class FireController:
             return WindModifier.negative
         elif opposite_wind_dir == left_neigh_dir or opposite_wind_dir == right_neigh_dir:
             return WindModifier.close_negative
-        return 1
+        return WindModifier.no_wind
