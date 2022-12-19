@@ -1,4 +1,4 @@
-from utils.enums import CellType, SectorType
+from utils.enums import CellType, SectorType, TreeType
 from view.spot import Spot
 import random
 
@@ -20,23 +20,23 @@ class Cell:
         self.cell_type == CellType.WATER
         self.visual.make_water()
     
-    def evaporate(self, water_evaporation_per_frame):
+    def evaporate(self, water_evaporation_per_frame: float):
         water = self.moisture * self.wood
         water -= water_evaporation_per_frame
         self.moisture = water/ self.wood
 
-    def make_fire(self, spread_per_frame):
+    def make_fire(self, spread_per_frame: float):
         self.cell_type = CellType.FIRE
         if self.wood > 0:
             self.wood -= spread_per_frame
             self.burning_wood +=  spread_per_frame
         self.visual.make_fire(self.wood, self.burning_wood, self.burned_wood)
 
-    def make_tree(self, tree_factor):
+    def make_tree(self, tree_factor: float, tree_type: TreeType):
         self.cell_type = CellType.TREE
-        self.moisture = 0.6
+        self.moisture = 0.6 if tree_type == TreeType.DECIDUOUS else 0.4
         self.wood = random.randint(10, 25) * tree_factor
-        self.visual.make_tree(self.wood)
+        self.visual.make_tree(self.wood, tree_type)
 
     def make_burned(self):
         self.cell_type == CellType.BURNED

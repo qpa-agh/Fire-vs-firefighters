@@ -27,11 +27,6 @@ class Model:
         self.update_neigbours()
         self.sectors = []
 
-        if forest_map:
-            self.load_sectors_from_img()
-        else:
-            self.generate_random_forest()
-        
         # how huge impact has amount of burning wood on fire spread
         self.tree_factor = 4
 
@@ -43,7 +38,12 @@ class Model:
 
         # how much water evaporates from wood per frame
         self.water_evaporation_per_frame = 5
-    
+
+        if forest_map:
+            self.load_sectors_from_img()
+        else:
+            self.generate_random_forest()
+
     def load_sectors_from_img(self):
         I = cv2.imread('maps\map1.png', cv2.IMREAD_GRAYSCALE)
         for y, row in enumerate(self.grid):
@@ -51,11 +51,17 @@ class Model:
                 if I[y][x] == 255:
                     cell.make_water()
                 elif I[y][x] > 200:
-                    if random.random() <= 0.1:
-                        cell.make_tree(4) #  self.tree_factor didn't work wtf
-                elif random.random() <= 0.7:
-                    cell.make_tree(4) #  self.tree_factor didn't work wtf
-    
+                    if random.random() <= 0.2:
+                        if random.random() < 0.5:
+                            cell.make_tree(self.tree_factor, TreeType.DECIDUOUS)
+                        else:
+                            cell.make_tree(self.tree_factor, TreeType.CONIFEROUS)
+                elif I[y][x] > 150: # leafy 
+                    if random.random() <= 0.8:
+                        cell.make_tree(self.tree_factor, TreeType.DECIDUOUS)
+                elif random.random() <= 0.8:
+                    cell.make_tree(self.tree_factor, TreeType.CONIFEROUS)
+
     def generate_sectors(self):
         trees_ratio = 0.8
         grass_ratio = 0.1
@@ -73,14 +79,14 @@ class Model:
 
     def generate_random_forest(self):
         self.generate_sectors()
-        
+
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
                 sector_idx = (y//10 * self.sectors_x + x//10)
                 cell.sector = self.sectors[sector_idx]
                 if (cell.sector == SectorType.TREES and random.random() <= 0.7) \
-                    or (cell.sector == SectorType.GRASS and random.random() <= 0.2) :
-                    cell.make_tree(4) #  self.tree_factor didn't work wtf
+                        or (cell.sector == SectorType.GRASS and random.random() <= 0.2):
+                    cell.make_tree(self.tree_factor, TreeType.DECIDUOUS)
                 elif cell.sector == SectorType.WATER:
                     cell.make_water()
 
@@ -91,7 +97,7 @@ class Model:
 
     def reset_spot(self, row, col):
         if self.grid[row][col].is_on_fire():
-            self.grid[row][col].make_tree(self.tree_factor)
+            self.grid[row][col].make_tree(self.tree_factor, TreeType.DECIDUOUS)
             self.cells_on_fire.remove(self.grid[row][col])
 
     def reset_model(self):

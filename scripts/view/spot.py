@@ -1,4 +1,4 @@
-from utils.enums import SectorType, ViewType
+from utils.enums import SectorType, ViewType, TreeType
 from view.colors import Color
 import pygame
 
@@ -36,9 +36,11 @@ class Spot:
     def make_burned(self, burned_wood: int):
         self.color = Color.burned[int(burned_wood-20)//20]
 
-    def make_tree(self, wood: int):
-        self.color = Color.tree[wood//20-1]
-    
+    def make_tree(self, wood: int, tree_type: TreeType):
+        if tree_type == TreeType.DECIDUOUS:
+            self.color = Color.tree[wood//20-1]
+        else:
+            self.color = Color.tree_col[wood//20-1]
     def make_water(self):
         self.color = Color.water
 
