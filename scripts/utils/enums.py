@@ -1,16 +1,26 @@
 from enum import Enum
 
+
 class CellType(Enum):
     GROUND = 0,
     TREE = 1,
     FIRE = 2,
     BURNED = 3,
-    GRASS = 4
+    GRASS = 4,
+    WATER = 5,
+
 
 class SectorType(Enum):
     GRASS = 0
     TREES = 1
+    WATER = 2
+
 
 class ViewType(Enum):
-    CELL = 0
-    SECTOR = 1
+    MAP = 0,
+    FIRE_FIGHTERS = 1
+
+
+class TreeType(Enum):
+    DECIDUOUS = 0,  # WITH LEAVES
+    CONIFEROUS = 1

@@ -1,4 +1,4 @@
-from utils.enums import SectorType, ViewType
+from utils.enums import SectorType, ViewType, TreeType
 from view.colors import Color
 import pygame
 
@@ -20,29 +20,29 @@ class Spot:
         """Returns idx of row and column of the object."""
         return self.row, self.col
 
-    def draw(self, viewType: ViewType, sector: SectorType):
-        """Draw the square with proper color and standaralized size."""
-        if viewType == ViewType.CELL:
-            pygame.draw.rect(
-                Spot.window, self.color, (self.y, self.x, Spot.width, Spot.width))
-        else:
-            col = Color.grass_green if sector == SectorType.GRASS else Color.tree[0]
-            pygame.draw.rect(
-                Spot.window, col, (self.y, self.x, Spot.width, Spot.width))
+    def draw(self):
+        """
+        Draw the square with proper color and standaralized size in CELL mode, otherways
+        draws 10x10 squares.
+        """
+        pygame.draw.rect( Spot.window, self.color, (self.y, self.x, Spot.width, Spot.width))
 
-    def make_fire(self, wood, burned_wood):
-        stage = burned_wood/(burned_wood + wood) * len(Color.fire)
-        self.color = Color.fire[int(stage)]
+    def make_fire(self, wood, burning_wood, burned_wood):
+        stage = int(burning_wood/(burning_wood + burned_wood + wood) * len(Color.fire))
+        if stage >= len(Color.fire):
+            stage -= 1
+        self.color = Color.fire[stage]
 
     def make_burned(self, burned_wood: int):
-        if burned_wood >= 1:
-            burned_wood -= 1
-        else:
-            burned_wood = 0
-        self.color = Color.burned[int(burned_wood//20)]
+        self.color = Color.burned[int(burned_wood-20)//20]
 
-    def make_tree(self, wood: int):
-        self.color = Color.tree[wood//20-1]
+    def make_tree(self, wood: int, tree_type: TreeType):
+        if tree_type == TreeType.DECIDUOUS:
+            self.color = Color.tree[wood//20-1]
+        else:
+            self.color = Color.tree_col[wood//20-1]
+    def make_water(self):
+        self.color = Color.water
 
     @staticmethod
     def set_width(width):

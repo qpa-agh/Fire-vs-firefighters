@@ -39,9 +39,9 @@ class SimulationController:
         self.view_controller.draw_buttons(self.button_handler)
         while self.run:
             if self.animation_started:
-                print(self.iteration)
+                # print(self.iteration)
                 self.iteration += 1
-            self.view_controller.draw_model(self.model)
+            self.view_controller.draw_model(self.model, self.iteration)
             for event in pygame.event.get():
                 self.resolve_event(event)
             self.animation_started = self.fire_controller.spread_fire(
@@ -61,10 +61,9 @@ class SimulationController:
                 self.animation_started = False
                 self.iteration = 0
             if event.key == pygame.K_z:  # change
-                self.view_controller.view_type = \
-                    ViewType.SECTOR \
-                    if self.view_controller.view_type == ViewType.CELL \
-                    else ViewType.CELL
+                self.view_controller.view_type = ViewType.MAP \
+                    if self.view_controller.view_type == ViewType.FIRE_FIGHTERS \
+                    else ViewType.FIRE_FIGHTERS
 
         if pygame.mouse.get_pressed()[0]:  # LEFT
             pos = pygame.mouse.get_pos()

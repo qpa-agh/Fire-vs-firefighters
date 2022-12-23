@@ -16,27 +16,45 @@ class ViewController:
         Button.set_window(self.win)
         pygame.display.set_caption("Fire figters vs fire")
         self.win.fill(Color.white)
-        self.view_type = ViewType.CELL
+        self.view_type = ViewType.MAP
 
-    def draw_model(self, model: Model):
+    def draw_model(self, model: Model, iteration):
         """Draws square grid with colored spots."""
         for row in model.grid:
             for cell in row:
-                cell.visual.draw(self.view_type, cell.sector)
-                
+                cell.visual.draw()
+
+        if self.view_type == ViewType.FIRE_FIGHTERS:
+            self.draw_fog()
+
         self.draw_compass()
+        self.draw_time(iteration)
+
+    def draw_fog(self):
+        """Add a layer of gray fog to enable fire figthers more cleaner visualization."""
+        shape_surf = pygame.Surface(pygame.Rect(
+            (0, 0, 600, 600)).size, pygame.SRCALPHA)
+        pygame.draw.rect(shape_surf, Color.fog, shape_surf.get_rect())
+        Spot.window.blit(shape_surf, (0, 0, 600, 600))
 
     def draw_buttons(self, button_handler: ButtonHandler):
         """Draws all buttons from list."""
         for button in button_handler.buttons:
             button.draw()
         self.draw_compass()
-    
+
     def draw_compass(self):
         """Draws compass image."""
         imp = pygame.image.load(
             "scripts\img\compass_small.png").convert_alpha()
         self.win.blit(imp, (self.width + 25, self.width - 190))
+
+    def draw_time(self, iteration):
+        pygame.draw.rect(Button.window, Color.white, [
+            self.width + 25, self.width - 300, 180, 20])
+        smallfont = pygame.font.SysFont('Verdana', 16)
+        text = smallfont.render("Time: " + str(iteration), True, Color.black)
+        Button.window.blit(text, (self.width + 25, self.width - 300))
 
     def update(self):
         pygame.display.update()
