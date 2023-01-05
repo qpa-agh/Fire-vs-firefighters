@@ -21,6 +21,8 @@ class FireController:
 
         new_generation = set()
         for cell in model.cells_on_fire:
+            if not cell.is_on_fire():
+                continue
             for key, neighbour in cell.neighbours.items():
                 if neighbour.is_tree():
                     wind_modifier = self.__get_wind_modifier(

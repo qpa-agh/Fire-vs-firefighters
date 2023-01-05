@@ -2,8 +2,10 @@ import pygame
 from controller.fire_controller import FireController
 from model.model import Model
 from model.wind_data import WindDirection
+from model.fighter import FighterAction
 from view.button_handler import ButtonHandler
 from view.view_controller import ViewController, ViewType
+from controller.fighters_controller import FightersController
 
 
 class SimulationController:
@@ -29,6 +31,7 @@ class SimulationController:
             self.BUTTON_LIST, model.width + 10)
         self.view_controller = ViewController(self.model.width)
         self.fire_controller = FireController()
+        self.fighters_controller = FightersController()
 
         self.animation_started = False
         self.run = True
@@ -46,8 +49,46 @@ class SimulationController:
                 self.resolve_event(event)
             self.animation_started = self.fire_controller.spread_fire(
                 self.model, self.animation_started)
+            self.fighters_controller.run_fighters(self.model, self.animation_started)
+            self.commander()
             self.view_controller.update()
         pygame.quit()
+
+    def commander(self):
+        if self.iteration == 1:
+            for team in self.model.teams:
+                team.set_target_action(FighterAction.DIG_DITCH)
+        if self.iteration == 300:
+            self.model.teams[0].set_target_sector((12, 11))
+            self.model.teams[0].set_target_action(FighterAction.DIG_DITCH)
+            self.model.teams[1].set_target_sector((12, 12))
+            self.model.teams[1].set_target_action(FighterAction.DIG_DITCH)
+            self.model.teams[2].set_target_sector((12, 13))
+            self.model.teams[2].set_target_action(FighterAction.DIG_DITCH)
+            self.model.teams[3].set_target_sector((12, 14))
+            self.model.teams[3].set_target_action(FighterAction.DIG_DITCH)
+            self.model.teams[4].set_target_sector((12, 15))
+            self.model.teams[4].set_target_action(FighterAction.DIG_DITCH)
+            self.model.teams[5].set_target_sector((11, 16))
+            self.model.teams[5].set_target_action(FighterAction.DIG_DITCH)
+            self.model.teams[6].set_target_sector((11, 10))
+            self.model.teams[6].set_target_action(FighterAction.DIG_DITCH)
+
+        if self.iteration == 600:
+            self.model.teams[0].set_target_sector((11, 11))
+            self.model.teams[0].set_target_action(FighterAction.EXTINGUISH)
+            self.model.teams[1].set_target_sector((11, 12))
+            self.model.teams[1].set_target_action(FighterAction.EXTINGUISH)
+            self.model.teams[2].set_target_sector((11, 13))
+            self.model.teams[2].set_target_action(FighterAction.EXTINGUISH)
+            self.model.teams[3].set_target_sector((11, 14))
+            self.model.teams[3].set_target_action(FighterAction.EXTINGUISH)
+            self.model.teams[4].set_target_sector((11, 15))
+            self.model.teams[4].set_target_action(FighterAction.EXTINGUISH)
+            self.model.teams[5].set_target_sector((10, 16))
+            self.model.teams[5].set_target_action(FighterAction.EXTINGUISH)
+            self.model.teams[6].set_target_sector((10, 10))
+            self.model.teams[6].set_target_action(FighterAction.EXTINGUISH)
 
     def resolve_event(self, event) -> None:
         if event.type == pygame.QUIT:

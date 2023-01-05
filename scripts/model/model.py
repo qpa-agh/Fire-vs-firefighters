@@ -1,4 +1,8 @@
-from model.cell import *
+from model.cell import Cell
+from model.fighter import Fighter, FighterAction
+from model.team import Team
+from utils.enums import Direction, SectorType, TreeType
+from view.spot import Spot
 from view.colors import *
 from view.button import *
 import random
@@ -43,6 +47,17 @@ class Model:
             self.load_sectors_from_img()
         else:
             self.generate_random_forest()
+
+        self.teams: list[Team] = []
+        self.generate_fighters(5, [(15, 15), (16, 16), (17, 17), (14, 16), (13, 17), 
+                                    (17, 19), (17, 20), (16, 21), (15, 19), (15, 20), (14, 21), (13, 20), (13, 19)])
+
+    def generate_fighters(self, per_sector, sectors):
+        for sector in sectors:
+            fighters = []
+            for i in range(per_sector):
+                fighters.append(self.__create_random_fighter(sector))
+            self.teams.append(Team(fighters, sector))
 
     def load_sectors_from_img(self):
         I = cv2.imread('maps\map1.png', cv2.IMREAD_GRAYSCALE)
@@ -105,6 +120,9 @@ class Model:
                       for i in range(self.cells_x)] for j in range(self.cells_y)]
         self.update_neigbours()
         self.generate_random_forest()
+        self.teams = []
+        self.generate_fighters(5, [(15, 15), (16, 16), (17, 17), (14, 16), (13, 17), 
+                            (17, 19), (17, 20), (16, 21), (15, 19), (15, 20), (14, 21), (13, 20), (13, 19)])
 
     def update_neigbours(self):
         for row_idx, row in enumerate(self.grid):
@@ -139,3 +157,14 @@ class Model:
                         # left
                 if col_idx > 0:
                     cell.neighbours[7] = self.grid[row_idx][col_idx-1]
+
+    def __create_random_fighter(self, sector):
+        min_y, max_y, min_x, max_x = self.__get_sector_bounds(sector)
+        y = random.randrange(min_y, max_y)
+        x = random.randrange(min_x, max_x)
+        action = FighterAction.random_action()
+        direction = Direction.random_direction()
+        return Fighter(y, x, (min_y, max_y, min_x, max_x), action, direction)
+
+    def __get_sector_bounds(self, sector):
+        return sector[0] * 10, (sector[0] + 1) * 10, sector[1] * 10, (sector[1] + 1) * 10 

@@ -26,16 +26,22 @@ class ViewController:
 
         if self.view_type == ViewType.FIRE_FIGHTERS:
             self.draw_fog()
+            for team in model.teams:
+                self.draw_fighters(team.fighters)
 
         self.draw_compass()
         self.draw_time(iteration)
 
+    def draw_fighters(self, fighters):
+        for fighter in fighters:
+            fighter.draw(Spot.window, Spot.width, Spot.width)
+
     def draw_fog(self):
         """Add a layer of gray fog to enable fire figthers more cleaner visualization."""
         shape_surf = pygame.Surface(pygame.Rect(
-            (0, 0, 600, 600)).size, pygame.SRCALPHA)
+            (0, 0, self.width, self.width)).size, pygame.SRCALPHA)
         pygame.draw.rect(shape_surf, Color.fog, shape_surf.get_rect())
-        Spot.window.blit(shape_surf, (0, 0, 600, 600))
+        Spot.window.blit(shape_surf, (0, 0, self.width, self.width))
 
     def draw_buttons(self, button_handler: ButtonHandler):
         """Draws all buttons from list."""
@@ -53,7 +59,7 @@ class ViewController:
         pygame.draw.rect(Button.window, Color.white, [
             self.width + 25, self.width - 300, 180, 20])
         smallfont = pygame.font.SysFont('Verdana', 16)
-        text = smallfont.render("Time: " + str(iteration), True, Color.black)
+        text = smallfont.render("Time: " + "{:.2f}".format(iteration / 30) + " min", True, Color.black)  # 360 it -> 12 min
         Button.window.blit(text, (self.width + 25, self.width - 300))
 
     def update(self):
