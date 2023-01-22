@@ -43,6 +43,9 @@ class Spot:
             self.color = Color.tree_col[wood//20-1]
     def make_water(self):
         self.color = Color.water
+    
+    def make_grass(self):
+        self.color = Color.grass_green
 
     @staticmethod
     def set_width(width):

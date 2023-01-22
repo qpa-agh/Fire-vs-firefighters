@@ -58,3 +58,7 @@ class Cell:
 
     def is_tree(self):
         return self.cell_type == CellType.TREE
+    
+    def make_grass(self):
+        self.cell_type == CellType.GRASS
+        self.visual.make_grass()

@@ -45,22 +45,17 @@ class Model:
             self.generate_random_forest()
 
     def load_sectors_from_img(self):
-        I = cv2.imread('maps\map1.png', cv2.IMREAD_GRAYSCALE)
+        I = cv2.imread('maps/niepolomice_1.png', cv2.COLOR_BGR2RGB) # blue - green -red
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
-                if I[y][x] == 255:
+                if I[y][x][0] >= 200: # blue
                     cell.make_water()
-                elif I[y][x] > 200:
-                    if random.random() <= 0.2:
-                        if random.random() < 0.5:
-                            cell.make_tree(self.tree_factor, TreeType.DECIDUOUS)
-                        else:
-                            cell.make_tree(self.tree_factor, TreeType.CONIFEROUS)
-                elif I[y][x] > 150: # leafy 
-                    if random.random() <= 0.8:
-                        cell.make_tree(self.tree_factor, TreeType.DECIDUOUS)
-                elif random.random() <= 0.8:
+                elif I[y][x][1] < 100 and I[y][x][1] > 90 and I[y][x][0] < 10 and I[y][x][2] < 10:  # green
                     cell.make_tree(self.tree_factor, TreeType.CONIFEROUS)
+                elif I[y][x][1] > 150 and I[y][x][0] < 40 and I[y][x][2] < 40:  # leafy
+                    cell.make_tree(self.tree_factor, TreeType.DECIDUOUS)
+                elif random.random() <= 0.8:
+                    cell.make_grass()
 
     def generate_sectors(self):
         trees_ratio = 0.8
