@@ -27,8 +27,11 @@ class Spot:
         """
         pygame.draw.rect( Spot.window, self.color, (self.y, self.x, Spot.width, Spot.width))
 
+    def make_ground(self):
+        self.color = Color.ground
+
     def make_fire(self, wood, burning_wood, burned_wood):
-        stage = int(burning_wood/(burning_wood + burned_wood + wood) * len(Color.fire))
+        stage = int(max(burning_wood/(burning_wood + burned_wood + wood), 0) * len(Color.fire))
         if stage >= len(Color.fire):
             stage -= 1
         self.color = Color.fire[stage]
@@ -36,11 +39,11 @@ class Spot:
     def make_burned(self, burned_wood: int):
         self.color = Color.burned[int(burned_wood-20)//20]
 
-    def make_tree(self, wood: int, tree_type: TreeType):
+    def make_tree(self, wood, tree_type: TreeType):
         if tree_type == TreeType.DECIDUOUS:
-            self.color = Color.tree[wood//20-1]
+            self.color = Color.tree[int(wood//20-1)]
         else:
-            self.color = Color.tree_col[wood//20-1]
+            self.color = Color.tree_col[int(wood//20-1)]
     def make_water(self):
         self.color = Color.water
     

@@ -1,5 +1,6 @@
+from __future__ import annotations
 from enum import Enum
-
+from random import randrange
 
 class CellType(Enum):
     GROUND = 0,
@@ -24,3 +25,28 @@ class ViewType(Enum):
 class TreeType(Enum):
     DECIDUOUS = 0,  # WITH LEAVES
     CONIFEROUS = 1
+
+
+class Direction:
+    NW = (-1, -1)
+    N  = (-1,  0)
+    NE = (-1,  1)
+    E  = ( 0,  1)
+    SE = ( 1,  1)
+    S  = ( 1,  0)
+    SW = ( 1, -1)
+    W  = ( 0, -1)
+
+    @staticmethod
+    def random_direction() -> Direction:
+        map = {
+            0: Direction.NW,
+            1: Direction.N,
+            2: Direction.NE,
+            3: Direction.E,
+            4: Direction.SE,
+            5: Direction.S,
+            6: Direction.SW,
+            7: Direction.W,
+        }
+        return map[randrange(0, 8)]
