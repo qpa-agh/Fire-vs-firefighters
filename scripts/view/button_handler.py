@@ -1,18 +1,17 @@
 from view.button import Button
+import time
 
 
 class ButtonHandler:
     """Manages all buttons and guarantees that exacly one button is pushed."""
 
-    def __init__(self, button_names_and_values, start: int) -> None:
-        self.start_x = start
+    def __init__(self, button_names_and_values) -> None:
         self.buttons = self.createButtons(button_names_and_values)
 
     def createButtons(self, button_names_and_values):
         buttons = []
         for name, value, pos in button_names_and_values:
-            button = Button(name, value, pos)
-            buttons.append(button)
+            buttons.append(Button(name, value, pos))
         return buttons
 
     def click_proper_button(self, x_pos, y_pos):

@@ -7,6 +7,7 @@ from view.colors import *
 from view.button import *
 import random
 import cv2
+import numpy as np
 
 
 class Model:
@@ -46,8 +47,12 @@ class Model:
         # how much water evaporates from wood per frame
         self.water_evaporation_per_frame = 5
 
+        self.start_x = 0 # start on the image x - img can be bigger
+        self.start_y = 0
+        self.zoom = 1
+
         if forest_map:
-            self.load_sectors_from_img()
+            self.load_sectors_from_img(forest_map)
         else:
             self.generate_random_forest()
 
@@ -62,8 +67,20 @@ class Model:
                 fighters.append(self.__create_random_fighter(sector))
             self.teams.append(Team(fighters, sector))
 
-    def load_sectors_from_img(self):
-        I = cv2.imread('maps/niepolomice_1.png', cv2.COLOR_BGR2RGB) # blue - green -red
+    def load_sectors_from_img(self, forest_map):
+        I = cv2.imread(forest_map, cv2.COLOR_BGR2RGB)  # blue - green -red
+        print("img shape: ", I.shape)
+        print("grid: ", self.cells_x, self.cells_y, np.asarray(self.grid).shape)
+        if self.cells_x > I.shape[1] or self.cells_x > I.shape[1]:
+            raise ValueError("Image is too small")
+        if self.start_x + self.cells_x >= I.shape[1]:
+            print("start_x shifted")
+            self.start_x = I.shape[1] - self.cells_x
+        if self.start_y + self.cells_y >= I.shape[0]:
+            print("start_y shifted")
+            self.start_y = I.shape[0] - self.cells_y
+
+                
         sectors_flammable_cells = {}
         for sector_row in range(self.sectors_y):
             for sector_col in range(self.sectors_x):
@@ -72,12 +89,13 @@ class Model:
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
                 sector = (y // 10, x // 10)
-                if I[y][x][0] >= 200: # blue
+                img_cell = I[y+self.start_y][x+self.start_x]
+                if img_cell[0] >= 200: # blue
                     cell.make_water()
-                elif I[y][x][1] < 100 and I[y][x][1] > 90 and I[y][x][0] < 10 and I[y][x][2] < 10:  # green
+                elif img_cell[1] < 100 and img_cell[1] > 90 and img_cell[0] < 10 and img_cell[2] < 10:  # green
                     cell.make_tree(self.tree_factor, TreeType.CONIFEROUS)
                     sectors_flammable_cells[sector] += 1
-                elif I[y][x][1] > 150 and I[y][x][0] < 40 and I[y][x][2] < 40:  # leafy
+                elif img_cell[1] > 150 and img_cell[0] < 40 and img_cell[2] < 40:  # leafy
                     cell.make_tree(self.tree_factor, TreeType.DECIDUOUS)
                     sectors_flammable_cells[sector] += 1
                 elif random.random() <= 0.8:
