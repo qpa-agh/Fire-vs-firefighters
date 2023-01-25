@@ -59,7 +59,7 @@ class ViewController:
         pygame.draw.rect(Button.window, Color.white, [
             self.width + 25, self.width - 300, 180, 20])
         smallfont = pygame.font.SysFont('Verdana', 16)
-        text = smallfont.render("Time: " + "{:.2f}".format(iteration / 30) + " min", True, Color.black)  # 360 it -> 12 min
+        text = smallfont.render("Time: " + "{:.2f}".format(iteration / 15) + " min", True, Color.black)  # 360 it -> 12 min
         Button.window.blit(text, (self.width + 25, self.width - 300))
 
     def update(self):

@@ -33,6 +33,11 @@ class FireController:
                         if neighbour.moisture <= 0.3:
                             neighbour.make_fire(model.burning_spread_per_frame)
                             new_generation.add(neighbour)
+                            sector = cell.row // 10, cell.col // 10
+                            if sector not in model.sectors_with_fire:
+                                model.sectors_with_fire.append(sector)
+                                if sector in model.flammable_sectors:
+                                    model.flammable_sectors.remove(sector)
                         else:
                             neighbour.evaporate(model.water_evaporation_per_frame)
 

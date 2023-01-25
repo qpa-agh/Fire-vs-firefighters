@@ -3,9 +3,12 @@ from controller.fire_controller import FireController
 from model.model import Model
 from model.wind_data import WindDirection
 from model.fighter import FighterAction
+from solver.decisions_generator import DecisionsGenerator
 from view.button_handler import ButtonHandler
 from view.view_controller import ViewController, ViewType
 from controller.fighters_controller import FightersController
+from solver.solver import Solver
+import itertools
 
 
 class SimulationController:
@@ -36,8 +39,15 @@ class SimulationController:
         self.animation_started = False
         self.run = True
         self.iteration = 0
+        self.solver = Solver()
+        self.decision_generator = DecisionsGenerator()
 
     def run_simulation(self) -> None:
+        A = [[3, 1], 
+             [0, 2]]
+        B = [[2, 1], 
+             [0, 3]]
+        self.solver.solve(A, B)
         pygame.init()
         self.view_controller.draw_buttons(self.button_handler)
         while self.run:
@@ -55,6 +65,12 @@ class SimulationController:
         pygame.quit()
 
     def commander(self):
+
+        if self.iteration == 20:
+            A, Adec, B, Bdec = self.decision_generator.create_game_price_array(self.model)
+            print(Adec, Bdec[:50])
+            print(len(Bdec))
+            self.solver.solve(A[:, :50], B[:, :50])
         if self.iteration == 1:
             for team in self.model.teams:
                 team.set_target_action(FighterAction.DIG_DITCH)

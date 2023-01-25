@@ -31,6 +31,9 @@ class Model:
         self.update_neigbours()
         self.sectors = []
 
+        self.sectors_with_fire = []
+        self.flammable_sectors = []
+
         # how huge impact has amount of burning wood on fire spread
         self.tree_factor = 4
 
@@ -61,16 +64,31 @@ class Model:
 
     def load_sectors_from_img(self):
         I = cv2.imread('maps/niepolomice_1.png', cv2.COLOR_BGR2RGB) # blue - green -red
+        sectors_flammable_cells = {}
+        for sector_row in range(self.sectors_y):
+            for sector_col in range(self.sectors_x):
+                sectors_flammable_cells[(sector_row, sector_col)] = 0
+
         for y, row in enumerate(self.grid):
             for x, cell in enumerate(row):
+                sector = (y // 10, x // 10)
                 if I[y][x][0] >= 200: # blue
                     cell.make_water()
                 elif I[y][x][1] < 100 and I[y][x][1] > 90 and I[y][x][0] < 10 and I[y][x][2] < 10:  # green
                     cell.make_tree(self.tree_factor, TreeType.CONIFEROUS)
+                    sectors_flammable_cells[sector] += 1
                 elif I[y][x][1] > 150 and I[y][x][0] < 40 and I[y][x][2] < 40:  # leafy
                     cell.make_tree(self.tree_factor, TreeType.DECIDUOUS)
+                    sectors_flammable_cells[sector] += 1
                 elif random.random() <= 0.8:
                     cell.make_grass()
+
+        for sector_row in range(self.sectors_y):
+            for sector_col in range(self.sectors_x):
+                sector = (sector_row, sector_col)
+                if sectors_flammable_cells[sector] >= 30:
+                    self.flammable_sectors.append(sector)
+
 
     def generate_sectors(self):
         trees_ratio = 0.8
@@ -81,6 +99,7 @@ class Model:
                 sector = None
                 if rand < trees_ratio:
                     sector = SectorType.TREES
+                    self.flammable_sectors.append((sector_y, sector_x))
                 elif rand < trees_ratio + grass_ratio:
                     sector = SectorType.GRASS
                 else:
@@ -104,6 +123,8 @@ class Model:
         if self.grid[row][col].is_tree():
             self.grid[row][col].make_fire(self.burning_spread_per_frame)
             self.cells_on_fire.add(self.grid[row][col])
+            if (row // 10, col // 10) not in self.sectors_with_fire:
+                self.sectors_with_fire.append((row // 10, col // 10))
 
     def reset_spot(self, row, col):
         if self.grid[row][col].is_on_fire():

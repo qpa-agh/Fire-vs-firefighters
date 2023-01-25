@@ -14,13 +14,13 @@ def moveAction(fighter: Fighter, model: Model) -> None:
     fighter.move_to_target()
 
 def digDitchAction(fighter: Fighter, model: Model) -> None:
-    cell = fighter.get_target_cell(model)
+    cell = fighter.get_target_cell(model, (1, 1))
     if cell is None or cell.cell_type != CellType.TREE:
         return
     cell.dig_ditch(Fighter.DITCH_MAKING_SPEED)
 
 def extinguishAction(fighter: Fighter, model: Model) -> None:
-    cell = fighter.get_target_cell(model)
+    cell = fighter.get_target_cell(model, (1, 1))
     if cell is None:
         return
     cell.extinguish(Fighter.EXTINGUISHING_SPEED, Fighter.EXTINGUISHING_MOISTURE_INCREASE)
@@ -46,8 +46,8 @@ class FighterAction(Enum):
 
 
 class Fighter:
-    DITCH_MAKING_SPEED = 10
-    EXTINGUISHING_SPEED = 20
+    DITCH_MAKING_SPEED = 15
+    EXTINGUISHING_SPEED = 30
     EXTINGUISHING_MOISTURE_INCREASE = 0.1
 
     def __init__(self, y: int, x: int, bounds: tuple[int], action: FighterAction = FighterAction.IDLE, direction: Direction = Direction.NW, move_every_n_action = 3) -> None:
@@ -82,9 +82,9 @@ class Fighter:
             self.action(self, model)
             self.n_action = 0
 
-    def get_target_cell(self, model: Model) -> Cell:
+    def get_target_cell(self, model: Model, padding: tuple[int] = (0, 0)) -> Cell:
         target_y, target_x = self.y + self.direction[0], self.x + self.direction[1]
-        if not self.target_in_bounds(target_y, target_x):
+        if not self.target_in_bounds(target_y, target_x, padding):
             return model.grid[self.y][self.x]
         return model.grid[target_y][target_x]
 
@@ -95,8 +95,11 @@ class Fighter:
         self.y = target_y
         self.x = target_x
     
-    def target_in_bounds(self, target_y, target_x):
-        if target_y < self.bounds[0] or target_y >= self.bounds[1] or target_x < self.bounds[2] or target_x >= self.bounds[3]:
+    def target_in_bounds(self, target_y, target_x, padding: tuple[int] = (0, 0)):
+        if target_y < self.bounds[0] - padding[0] or \
+                target_y >= self.bounds[1] + padding[0] or \
+                target_x < self.bounds[2] - padding[1] or \
+                target_x >= self.bounds[3] + padding[1]:
             return False
         return True
     
