@@ -17,13 +17,16 @@ class ViewController:
         pygame.display.set_caption("Fire figters vs fire")
         self.win.fill(Color.white)
         self.view_type = ViewType.MAP
+        self.zoom_scale = 1
+        self.max_zoom_scale = 8
+        self.min_zoom_scale = 1
 
     def draw_model(self, model: Model, iteration):
         """Draws square grid with colored spots."""
         for row in model.grid:
             for cell in row:
-                cell.visual.draw()
-
+                cell.visual.draw(self.zoom_scale)
+        self.draw_panel()
         if self.view_type == ViewType.FIRE_FIGHTERS:
             self.draw_fog()
             for team in model.teams:
@@ -71,3 +74,23 @@ class ViewController:
         row = y // Spot.width
         col = x // Spot.width
         return row, col
+    
+    def zoom_in(self):
+        if self.zoom_scale < self.max_zoom_scale:
+            self.zoom_scale = int(2*self.zoom_scale)
+        else:
+            print("max zoom was reached")
+        print("zoom: ", self.zoom_scale)
+    
+    def zoom_out(self):
+        if self.zoom_scale >  1:
+            self.zoom_scale = int(self.zoom_scale//2)
+        else:
+            print("min zoom was reached")
+        print("zoom: ", self.zoom_scale)
+    
+    def draw_panel(self):
+        shape_surf = pygame.Surface(pygame.Rect(
+            (0, 0, 200, self.width)).size, pygame.SRCALPHA)
+        pygame.draw.rect(shape_surf, Color.white, shape_surf.get_rect())
+        self.win.blit(shape_surf, (self.width, 0, self.width, self.width))

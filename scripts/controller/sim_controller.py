@@ -55,6 +55,7 @@ class SimulationController:
                 # print(self.iteration)
                 self.iteration += 1
             self.view_controller.draw_model(self.model, self.iteration)
+            self.view_controller.draw_buttons(self.button_handler_wind)
             for event in pygame.event.get():
                 self.resolve_event(event)
             self.animation_started = self.fire_controller.spread_fire(
@@ -121,6 +122,10 @@ class SimulationController:
                 self.view_controller.view_type = ViewType.MAP \
                     if self.view_controller.view_type == ViewType.FIRE_FIGHTERS \
                     else ViewType.FIRE_FIGHTERS
+            if event.key == pygame.K_i: # zoom in
+                self.view_controller.zoom_in()
+            if event.key == pygame.K_o: # zoom out
+                self.view_controller.zoom_out()
 
         if pygame.mouse.get_pressed()[0]:  # LEFT
             pos = pygame.mouse.get_pos()

@@ -69,8 +69,8 @@ class Model:
 
     def load_sectors_from_img(self, forest_map):
         I = cv2.imread(forest_map, cv2.COLOR_BGR2RGB)  # blue - green -red
-        print("img shape: ", I.shape)
-        print("grid: ", self.cells_x, self.cells_y, np.asarray(self.grid).shape)
+        # print("img shape: ", I.shape)
+        # print("grid: ", self.cells_x, self.cells_y, np.asarray(self.grid).shape)
         if self.cells_x > I.shape[1] or self.cells_x > I.shape[1]:
             raise ValueError("Image is too small")
         if self.start_x + self.cells_x >= I.shape[1]:
