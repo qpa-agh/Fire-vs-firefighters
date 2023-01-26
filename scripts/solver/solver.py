@@ -6,9 +6,11 @@ class Solver:
         pass
 
     def solve(self, A, B, Adec, Bdec):
+        print("A: ", A)
+        print("B: ", B)
         game = nash.Game(A, B)
         eqs = game.vertex_enumeration()
-        eq = next(eqs, None)
+        eq = next(eqs, None) # throws divide by zero
         if eq is None:
             return []
         return self.__get_actions(eq, Adec, Bdec)

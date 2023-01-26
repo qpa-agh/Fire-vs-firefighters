@@ -16,8 +16,7 @@ sys.setrecursionlimit(100000)
 def new_procees_to_solve_nash(conn):
     A, Adec, B, Bdec = conn.recv()
     solver = Solver()
-    print(len(Adec))
-    print(len(Bdec))
+    print("Adec lenght: ", len(Adec), "Bdec lenght: ", len(Bdec))
     actions = solver.solve(A, B, Adec, Bdec)
     print(actions)
 
@@ -73,16 +72,16 @@ class SimulationController:
         return actions
 
     def run_simulation(self) -> None:
-        pygame.init()
         self.view_controller.draw_buttons(self.button_handler_wind)
         while self.run:
             if self.animation_started:
-                # print(self.iteration)
                 self.iteration += 1
             self.view_controller.draw_model(self.model, self.iteration)
             self.view_controller.draw_buttons(self.button_handler_wind)
+
             for event in pygame.event.get():
                 self.resolve_event(event)
+
             self.animation_started = self.fire_controller.spread_fire(
                 self.model, self.animation_started)
             self.fighters_controller.run_fighters(
@@ -94,20 +93,11 @@ class SimulationController:
     def commander(self):
         if self.iteration % 30 == 16:
             actions = self.get_commanders_actions()
-            print(actions)
+            self.display_actions(actions)
             self.model.apply_actions(actions)
         if self.iteration == 1:
             for team in self.model.teams:
                 team.set_target_action(FighterAction.DIG_DITCH)
-        # if self.iteration == 300:
-        #     self.model.teams[0].set_target_sector((12, 11))
-        #     self.model.teams[0].set_target_action(FighterAction.DIG_DITCH)
-        #     self.model.teams[1].set_target_sector((12, 12))
-        #     self.model.teams[1].set_target_action(FighterAction.DIG_DITCH)
-        #     self.model.teams[2].set_target_sector((12, 13))
-        #     self.model.teams[2].set_target_action(FighterAction.DIG_DITCH)
-        #     self.model.teams[3].set_target_sector((12, 14))
-        #     self.model.teams[3].set_target_action(FighterAction.DIG_DITCH)
            
 
     def resolve_event(self, event) -> None:
@@ -163,3 +153,11 @@ class SimulationController:
             row, col = self.view_controller.get_clicked_pos(pos)
             if row < self.model.cells_y and col < self.model.cells_x:
                 self.model.reset_spot(row, col)
+
+    def display_actions(self, actions):
+        for action in actions:
+            print(" --------")
+            print("Action:")
+            team, move, pos = action
+            if team: print("team:", team.target_action, team.target_action)
+            print("move:", move, "  pos:", pos)
