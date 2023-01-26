@@ -78,8 +78,8 @@ class ViewController:
     def get_clicked_pos(self, pos) -> tuple():
         """Returns row and columns idx of clicked place."""
         x, y = pos
-        row = y // Spot.width
-        col = x // Spot.width
+        row = y // Spot.width // self.zoom_scale + self.shift_y
+        col = x // Spot.width // self.zoom_scale + self.shift_x
         return row, col
     
     def zoom_in(self):
