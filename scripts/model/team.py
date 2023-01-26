@@ -39,6 +39,8 @@ class Team:
         print(f'Id: {self.team_id}, action: {self.target_action}, target_sector: {self.target_sector}, move: {self.move_team}')
         for fighter in self.fighters:
             fighter.run_action(model)
+        if self.target_action == FighterAction.EXTINGUISH:
+            model.update_sector_on_fire(self.target_sector)
 
     def __direction_from_move(self):
         dir_y = 0 if self.move_team[0] == 0 else self.move_team[0] // abs(self.move_team[0])
