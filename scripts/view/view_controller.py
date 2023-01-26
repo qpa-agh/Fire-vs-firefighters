@@ -9,9 +9,11 @@ from view.colors import Color
 
 
 class ViewController:
-    def __init__(self, width) -> None:
+    def __init__(self, width, height, gap) -> None:
         self.width = width
-        self.win = pygame.display.set_mode((width + 200, width))
+        self.height = height
+        self.gap = gap
+        self.win = pygame.display.set_mode((self.width + 200, self.height))
         Spot.set_window(self.win)
         Button.set_window(self.win)
         pygame.display.set_caption("Fire figters vs fire")
@@ -20,12 +22,16 @@ class ViewController:
         self.zoom_scale = 1
         self.max_zoom_scale = 8
         self.min_zoom_scale = 1
+        self.start_cell_x = 0
+        self.start_cell_y = 0
 
     def draw_model(self, model: Model, iteration):
         """Draws square grid with colored spots."""
-        for row in model.grid:
-            for cell in row:
-                cell.visual.draw(self.zoom_scale)
+        # print("y,x: ",len(model.grid), len(model.grid[0]))
+        for y in range(self.start_cell_y, len(model.grid)):
+            for x in range(self.start_cell_x, len(model.grid[0])):
+                model.grid[y][x].visual.draw(
+                    self.zoom_scale, self.start_cell_y, self.start_cell_x)
         self.draw_panel()
         if self.view_type == ViewType.FIRE_FIGHTERS:
             self.draw_fog()
@@ -56,14 +62,14 @@ class ViewController:
         """Draws compass image."""
         imp = pygame.image.load(
             "scripts\img\compass_small.png").convert_alpha()
-        self.win.blit(imp, (self.width + 25, self.width - 190))
+        self.win.blit(imp, (self.width + 25, self.height - 190))
 
     def draw_time(self, iteration):
         pygame.draw.rect(Button.window, Color.white, [
-            self.width + 25, self.width - 300, 180, 20])
+            self.width + 25, self.height - 300, 180, 20])
         smallfont = pygame.font.SysFont('Verdana', 16)
         text = smallfont.render("Time: " + "{:.2f}".format(iteration / 15) + " min", True, Color.black)  # 360 it -> 12 min
-        Button.window.blit(text, (self.width + 25, self.width - 300))
+        Button.window.blit(text, (self.width + 25, self.height - 300))
 
     def update(self):
         pygame.display.update()
@@ -91,6 +97,30 @@ class ViewController:
     
     def draw_panel(self):
         shape_surf = pygame.Surface(pygame.Rect(
-            (0, 0, 200, self.width)).size, pygame.SRCALPHA)
+            (0, 0, 200, self.height)).size, pygame.SRCALPHA)
         pygame.draw.rect(shape_surf, Color.white, shape_surf.get_rect())
-        self.win.blit(shape_surf, (self.width, 0, self.width, self.width))
+        self.win.blit(shape_surf, (self.width, 0, self.width, self.height))
+    
+    def move_up(self):
+        if self.start_cell_y == self.width - 1:
+            return
+        self.start_cell_y -= 1
+        print("up", self.start_cell_y, self.start_cell_x)
+    
+    def move_down(self):
+        if self.start_cell_y == 0:
+            return
+        self.start_cell_y += 1
+        print("down", self.start_cell_y, self.start_cell_x)
+    
+    def move_left(self):
+        if self.start_cell_x == self.width - 1:
+            return
+        self.start_cell_x += 1
+        print("left", self.start_cell_y, self.start_cell_x)
+    
+    def move_right(self):
+        if self.start_cell_x == 0:
+            return
+        self.start_cell_x -= 1
+        print("right", self.start_cell_y, self.start_cell_x)

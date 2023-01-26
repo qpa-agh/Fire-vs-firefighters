@@ -7,5 +7,6 @@ def loadParameters():
     data = json.load(f)
     width = data['width']
     rows = data['rows']
+    gap = data['gap']
     f.close()
-    return width, rows
+    return width, rows, gap

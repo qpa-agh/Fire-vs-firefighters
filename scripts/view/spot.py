@@ -20,13 +20,13 @@ class Spot:
         """Returns idx of row and column of the object."""
         return self.row, self.col
 
-    def draw(self, zoom):
+    def draw(self, zoom, shift_y, shift_x):
         """
         Draw the square with proper color and standaralized size in CELL mode, otherways
         draws 10x10 squares.
         """
-        pygame.draw.rect(Spot.window, self.color, (self.y *
-                         zoom, self.x*zoom, Spot.width*zoom, Spot.width*zoom))
+        pygame.draw.rect(Spot.window, self.color, ((self.y + shift_x) *
+                         zoom, (self.x+ shift_y)*zoom, Spot.width*zoom, Spot.width*zoom))
 
     def make_ground(self):
         self.color = Color.ground

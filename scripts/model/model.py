@@ -11,7 +11,7 @@ import numpy as np
 
 
 class Model:
-    def __init__(self, cells_y, cells_x, width, forest_map=None):
+    def __init__(self, cells_y, cells_x, gap, forest_map=None):
         assert cells_y % 10 == 0
         assert cells_x % 10 == 0
         self.cells_y = cells_y       # nr of rows
@@ -20,8 +20,7 @@ class Model:
         self.sectors_y = cells_y // 10
         self.sectors_x = cells_x // 10
 
-        self.width = width           # display width
-        self.gap = width // cells_y  # width of the spot
+        self.gap = gap  # width of the spot
         Spot.set_width(self.gap)
 
         self.cells_on_fire = set()
@@ -202,3 +201,9 @@ class Model:
 
     def __get_sector_bounds(self, sector):
         return sector[0] * 10, (sector[0] + 1) * 10, sector[1] * 10, (sector[1] + 1) * 10 
+    
+    def get_width(self):
+        return self.gap * self.cells_x
+    
+    def get_height(self):
+        return self.gap * self.cells_y
