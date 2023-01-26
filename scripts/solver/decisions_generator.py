@@ -64,10 +64,19 @@ class DecisionsGenerator:
             list(team_commander_prices_dict.values()), 90)
         return dict((key, value) for key, value in team_commander_prices_dict.items() if value >= threshold)
     
-    # def compute_necessary_teams(self, sectors_on_fire) -> int:
-    #     if sectors_on_fire <= 2:
-    #         return 1
-    #     elif 
+    def compute_necessary_teams(self, sectors_on_fire) -> int:
+        if sectors_on_fire <= 2:
+            return 1
+        elif sectors_on_fire <= 9:
+            return int(sectors_on_fire//4)
+        elif sectors_on_fire <= 20:
+            return int(sectors_on_fire//5)
+        elif sectors_on_fire <= 40:
+            return int(sectors_on_fire//6)
+        elif sectors_on_fire <= 56:
+            return int(sectors_on_fire//7)
+        else:
+            return int(sectors_on_fire//8)
 
     def __calculate_logistic_prizes(self, model):
         logistic_order_values = {
@@ -87,7 +96,8 @@ class DecisionsGenerator:
             incentive_to_fallback_a_team = 100
         
         # idle
-        elif nr_of_teams >= nr_of_sectors_on_fire//4 or teams_shortage <= int(nr_of_sectors_on_fire*0.6) or (teams_shortage <= 5 and nr_of_teams >= 2):
+        # elif nr_of_teams >= nr_of_sectors_on_fire//4 or teams_shortage <= int(nr_of_sectors_on_fire*0.6) or (teams_shortage <= 5 and nr_of_teams >= 2):
+        elif nr_of_teams >= self.compute_necessary_teams(nr_of_sectors_on_fire):
             logistic_order_values[(
                 None, LogisticAction.ADD_NEW_TEAM, None)] = -500
             incentive_to_fallback_a_team = -100
