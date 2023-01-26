@@ -25,8 +25,8 @@ class Spot:
         Draw the square with proper color and standaralized size in CELL mode, otherways
         draws 10x10 squares.
         """
-        pygame.draw.rect(Spot.window, self.color, ((self.y + shift_x) *
-                         zoom, (self.x+ shift_y)*zoom, Spot.width*zoom, Spot.width*zoom))
+        pygame.draw.rect(Spot.window, self.color, ((self.y - 2*shift_x) *
+                         zoom, (self.x- 2*shift_y)*zoom, Spot.width*zoom, Spot.width*zoom))
 
     def make_ground(self):
         self.color = Color.ground

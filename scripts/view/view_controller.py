@@ -22,16 +22,18 @@ class ViewController:
         self.zoom_scale = 1
         self.max_zoom_scale = 8
         self.min_zoom_scale = 1
-        self.start_cell_x = 0
-        self.start_cell_y = 0
+        self.shift_x = 0
+        self.shift_y = 0
+        self.shift_step = 10
 
     def draw_model(self, model: Model, iteration):
         """Draws square grid with colored spots."""
         # print("y,x: ",len(model.grid), len(model.grid[0]))
-        for y in range(self.start_cell_y, len(model.grid)):
-            for x in range(self.start_cell_x, len(model.grid[0])):
+        # Spot.set_width(self.gap)
+        for y in range(self.shift_y, len(model.grid)):
+            for x in range(self.shift_x, len(model.grid[0])):
                 model.grid[y][x].visual.draw(
-                    self.zoom_scale, self.start_cell_y, self.start_cell_x)
+                    self.zoom_scale, self.shift_y, self.shift_x)
         self.draw_panel()
         if self.view_type == ViewType.FIRE_FIGHTERS:
             self.draw_fog()
@@ -93,6 +95,9 @@ class ViewController:
             self.zoom_scale = int(self.zoom_scale//2)
         else:
             print("min zoom was reached")
+        if self.zoom_scale == 1:
+            self.shift_x = 1
+            self.shift_y = 1
         print("zoom: ", self.zoom_scale)
     
     def draw_panel(self):
@@ -102,25 +107,29 @@ class ViewController:
         self.win.blit(shape_surf, (self.width, 0, self.width, self.height))
     
     def move_up(self):
-        if self.start_cell_y == self.width - 1:
+        if self.shift_y - self.shift_step <= 0:
+            self.shift_y = 0
             return
-        self.start_cell_y -= 1
-        print("up", self.start_cell_y, self.start_cell_x)
+        self.shift_y -= self.shift_step
+        print("up", self.shift_y, self.shift_x)
     
     def move_down(self):
-        if self.start_cell_y == 0:
+        relative_heaigh = self.height //2 // self.zoom_scale
+        if self.shift_y + relative_heaigh >= self.height//2 - self.zoom_scale*2:
             return
-        self.start_cell_y += 1
-        print("down", self.start_cell_y, self.start_cell_x)
+        self.shift_y += self.shift_step
+        print("down", self.shift_y, self.shift_x)
     
     def move_left(self):
-        if self.start_cell_x == self.width - 1:
+        if self.shift_x - self.shift_step <= 0:
+            self.shift_x = 0
             return
-        self.start_cell_x += 1
-        print("left", self.start_cell_y, self.start_cell_x)
+        self.shift_x -= self.shift_step
+        print("left", self.shift_y, self.shift_x)
     
     def move_right(self):
-        if self.start_cell_x == 0:
+        relative_width = self.width // 2 // self.zoom_scale
+        if self.shift_x + relative_width >= (self.width)//2 - self.zoom_scale*2:
             return
-        self.start_cell_x -= 1
-        print("right", self.start_cell_y, self.start_cell_x)
+        self.shift_x += self.shift_step
+        print("right", self.shift_y, self.shift_x)
