@@ -10,6 +10,6 @@ def main(gap, rows, forest_map):
 
 
 if __name__ == '__main__':
-    WIDTH, ROWS, GAP = loadParameters()
+    ROWS, GAP = loadParameters()
     forest_map = 'maps/niepolomice_1.png' # change to None to generate map randomly
     main(GAP, ROWS, forest_map)

@@ -24,12 +24,10 @@ class ViewController:
         self.min_zoom_scale = 1
         self.shift_x = 0
         self.shift_y = 0
-        self.shift_step = 10
+        self.shift_step = 10 # how many cells to shiht when moving
 
     def draw_model(self, model: Model, iteration):
         """Draws square grid with colored spots."""
-        # print("y,x: ",len(model.grid), len(model.grid[0]))
-        # Spot.set_width(self.gap)
         for y in range(self.shift_y, len(model.grid)):
             for x in range(self.shift_x, len(model.grid[0])):
                 model.grid[y][x].visual.draw(
@@ -84,21 +82,26 @@ class ViewController:
         return row, col
     
     def zoom_in(self):
+        """Zoom in the view with factor = 2. Max and zoom scales are defined in constructor."""
         if self.zoom_scale < self.max_zoom_scale:
             self.zoom_scale = int(2*self.zoom_scale)
-        else:
-            print("max zoom was reached")
-        print("zoom: ", self.zoom_scale)
     
     def zoom_out(self):
+        """Zoom out the view with factor = 2. Max and zoom scales are defined in constructor."""
         if self.zoom_scale >  1:
             self.zoom_scale = int(self.zoom_scale//2)
-        else:
-            print("min zoom was reached")
+        
+        relative_height = self.height // 2 // self.zoom_scale
+        if self.shift_y + relative_height >= self.height//2 - self.zoom_scale*2:
+            self.shift_y = self.height//2 - self.zoom_scale*2 - relative_height
+        
+        relative_width = self.width // 2 // self.zoom_scale
+        if self.shift_x + relative_width >= (self.width)//2 - self.zoom_scale*2:
+            self.shift_x = (self.width)//2 - self.zoom_scale*2 - relative_width
+        
         if self.zoom_scale == 1:
-            self.shift_x = 1
-            self.shift_y = 1
-        print("zoom: ", self.zoom_scale)
+            self.shift_x = 0
+            self.shift_y = 0
     
     def draw_panel(self):
         shape_surf = pygame.Surface(pygame.Rect(
@@ -107,29 +110,29 @@ class ViewController:
         self.win.blit(shape_surf, (self.width, 0, self.width, self.height))
     
     def move_up(self):
+        """Move view up when is zoom in."""
         if self.shift_y - self.shift_step <= 0:
             self.shift_y = 0
             return
         self.shift_y -= self.shift_step
-        print("up", self.shift_y, self.shift_x)
     
     def move_down(self):
-        relative_heaigh = self.height //2 // self.zoom_scale
-        if self.shift_y + relative_heaigh >= self.height//2 - self.zoom_scale*2:
+        """Move down when is zoom in."""
+        relative_height = self.height // 2 // self.zoom_scale
+        if self.shift_y + relative_height >= self.height//2 - self.zoom_scale*2:
             return
         self.shift_y += self.shift_step
-        print("down", self.shift_y, self.shift_x)
     
     def move_left(self):
+        """Move left when is zoom in."""
         if self.shift_x - self.shift_step <= 0:
             self.shift_x = 0
             return
         self.shift_x -= self.shift_step
-        print("left", self.shift_y, self.shift_x)
     
     def move_right(self):
+        """Move right when is zoom in."""
         relative_width = self.width // 2 // self.zoom_scale
         if self.shift_x + relative_width >= (self.width)//2 - self.zoom_scale*2:
             return
         self.shift_x += self.shift_step
-        print("right", self.shift_y, self.shift_x)
