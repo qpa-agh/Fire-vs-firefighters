@@ -1,4 +1,4 @@
-from utils.enums import SectorType, ViewType, TreeType
+from utils.enums import TreeType
 from view.colors import Color
 import pygame
 
@@ -20,18 +20,20 @@ class Spot:
         """Returns idx of row and column of the object."""
         return self.row, self.col
 
-    def draw(self):
+    def draw(self, zoom, shift_y, shift_x):
         """
         Draw the square with proper color and standaralized size in CELL mode, otherways
         draws 10x10 squares.
         """
-        pygame.draw.rect( Spot.window, self.color, (self.y, self.x, Spot.width, Spot.width))
+        pygame.draw.rect(Spot.window, self.color, ((self.y - 2*shift_x) *
+                         zoom, (self.x- 2*shift_y)*zoom, Spot.width*zoom, Spot.width*zoom))
 
     def make_ground(self):
         self.color = Color.ground
 
     def make_fire(self, wood, burning_wood, burned_wood):
-        stage = int(max(burning_wood/(burning_wood + burned_wood + wood), 0) * len(Color.fire))
+        stage = int(
+            max(burning_wood/(burning_wood + burned_wood + wood), 0) * len(Color.fire))
         if stage >= len(Color.fire):
             stage -= 1
         self.color = Color.fire[stage]
@@ -44,9 +46,10 @@ class Spot:
             self.color = Color.tree[int(wood//20-1)]
         else:
             self.color = Color.tree_col[int(wood//20-1)]
+
     def make_water(self):
         self.color = Color.water
-    
+
     def make_grass(self):
         self.color = Color.grass_green
 

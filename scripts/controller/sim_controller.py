@@ -28,25 +28,27 @@ def new_procees_to_solve_nash(conn):
 class SimulationController:
     def __init__(self, model: Model) -> None:
         self.model = model
-        self.BUTTON_LIST = [("NW", WindDirection.NW,
-                             (self.model.width + 25, self.model.width - 190)),
-                            ("N", WindDirection.N,
-                             (self.model.width + 94, self.model.width - 215)),
-                            ("NE", WindDirection.NE,
-                             (self.model.width + 145, self.model.width - 190),),
-                            ("E", WindDirection.E, (self.model.width +
-                             180, self.model.width - 125),),
-                            ("SE", WindDirection.SE,
-                             (self.model.width + 145, self.model.width - 60)),
-                            ("S", WindDirection.S,
-                             (self.model.width + 94, self.model.width - 35)),
-                            ("SW", WindDirection.SW,
-                             (self.model.width + 25, self.model.width - 60)),
-                            ("W", WindDirection.W,  (self.model.width + 5, self.model.width - 125))]
+        self.width = model.get_width()
+        self.height = model.get_height()
 
-        self.button_handler = ButtonHandler(
-            self.BUTTON_LIST, model.width + 10)
-        self.view_controller = ViewController(self.model.width)
+        self.BUTTON_LIST_WIND = [("NW", WindDirection.NW, (self.width + 25, self.height - 190)),
+                                 ("N", WindDirection.N,
+                                  (self.width + 94, self.height - 215)),
+                                 ("NE", WindDirection.NE,
+                                  (self.width + 145, self.height - 190),),
+                                 ("E", WindDirection.E,
+                                  (self.width + 180, self.height - 125),),
+                                 ("SE", WindDirection.SE,
+                                  (self.width + 145, self.height - 60)),
+                                 ("S", WindDirection.S,
+                                  (self.width + 94, self.height - 35)),
+                                 ("SW", WindDirection.SW,
+                                  (self.width + 25, self.height - 60)),
+                                 ("W", WindDirection.W,  (self.width + 5, self.height - 125))]
+
+        self.button_handler_wind = ButtonHandler(self.BUTTON_LIST_WIND)
+
+        self.view_controller = ViewController(self.width, self.height, self.model.gap)
         self.fire_controller = FireController()
         self.fighters_controller = FightersController()
 
@@ -72,17 +74,19 @@ class SimulationController:
 
     def run_simulation(self) -> None:
         pygame.init()
-        self.view_controller.draw_buttons(self.button_handler)
+        self.view_controller.draw_buttons(self.button_handler_wind)
         while self.run:
             if self.animation_started:
                 # print(self.iteration)
                 self.iteration += 1
             self.view_controller.draw_model(self.model, self.iteration)
+            self.view_controller.draw_buttons(self.button_handler_wind)
             for event in pygame.event.get():
                 self.resolve_event(event)
             self.animation_started = self.fire_controller.spread_fire(
                 self.model, self.animation_started)
-            self.fighters_controller.run_fighters(self.model, self.animation_started)
+            self.fighters_controller.run_fighters(
+                self.model, self.animation_started)
             self.commander()
             self.view_controller.update()
         pygame.quit()
@@ -122,6 +126,20 @@ class SimulationController:
                     if self.view_controller.view_type == ViewType.FIRE_FIGHTERS \
                     else ViewType.FIRE_FIGHTERS
 
+            if event.key == pygame.K_i:  # zoom in
+                self.view_controller.zoom_in()
+            if event.key == pygame.K_o:  # zoom out
+                self.view_controller.zoom_out()
+
+            if event.key == pygame.K_w:  # top
+                self.view_controller.move_up()
+            if event.key == pygame.K_a:  # left
+                self.view_controller.move_left()
+            if event.key == pygame.K_s:  # bottom
+                self.view_controller.move_down()
+            if event.key == pygame.K_d:  # right
+                self.view_controller.move_right()
+
         if pygame.mouse.get_pressed()[0]:  # LEFT
             pos = pygame.mouse.get_pos()
             row, col = self.view_controller.get_clicked_pos(pos)
@@ -133,9 +151,10 @@ class SimulationController:
                 self.model.make_spot_fire(row, col)
             else:  # check pushing button
                 x, y = pos
-                self.model.wind_direction = self.button_handler.click_proper_button(
+                self.model.wind_direction = self.button_handler_wind.click_proper_button(
                     x, y)
-                self.view_controller.draw_buttons(self.button_handler)
+
+                self.view_controller.draw_buttons(self.button_handler_wind)
 
         elif pygame.mouse.get_pressed()[2]:  # RIGHT
             if self.animation_started:

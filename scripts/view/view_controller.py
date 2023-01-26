@@ -9,21 +9,30 @@ from view.colors import Color
 
 
 class ViewController:
-    def __init__(self, width) -> None:
+    def __init__(self, width, height, gap) -> None:
         self.width = width
-        self.win = pygame.display.set_mode((width + 200, width))
+        self.height = height
+        self.gap = gap
+        self.win = pygame.display.set_mode((self.width + 200, self.height))
         Spot.set_window(self.win)
         Button.set_window(self.win)
         pygame.display.set_caption("Fire figters vs fire")
         self.win.fill(Color.white)
         self.view_type = ViewType.MAP
+        self.zoom_scale = 1
+        self.max_zoom_scale = 8
+        self.min_zoom_scale = 1
+        self.shift_x = 0
+        self.shift_y = 0
+        self.shift_step = 10 # how many cells to shiht when moving
 
     def draw_model(self, model: Model, iteration):
         """Draws square grid with colored spots."""
-        for row in model.grid:
-            for cell in row:
-                cell.visual.draw()
-
+        for y in range(self.shift_y, len(model.grid)):
+            for x in range(self.shift_x, len(model.grid[0])):
+                model.grid[y][x].visual.draw(
+                    self.zoom_scale, self.shift_y, self.shift_x)
+        self.draw_panel()
         if self.view_type == ViewType.FIRE_FIGHTERS:
             self.draw_fog()
             for team in model.teams:
@@ -53,14 +62,14 @@ class ViewController:
         """Draws compass image."""
         imp = pygame.image.load(
             "scripts\img\compass_small.png").convert_alpha()
-        self.win.blit(imp, (self.width + 25, self.width - 190))
+        self.win.blit(imp, (self.width + 25, self.height - 190))
 
     def draw_time(self, iteration):
         pygame.draw.rect(Button.window, Color.white, [
-            self.width + 25, self.width - 300, 180, 20])
+            self.width + 25, self.height - 300, 180, 20])
         smallfont = pygame.font.SysFont('Verdana', 16)
         text = smallfont.render("Time: " + "{:.2f}".format(iteration / 15) + " min", True, Color.black)  # 360 it -> 12 min
-        Button.window.blit(text, (self.width + 25, self.width - 300))
+        Button.window.blit(text, (self.width + 25, self.height - 300))
 
     def update(self):
         pygame.display.update()
@@ -71,3 +80,59 @@ class ViewController:
         row = y // Spot.width
         col = x // Spot.width
         return row, col
+    
+    def zoom_in(self):
+        """Zoom in the view with factor = 2. Max and zoom scales are defined in constructor."""
+        if self.zoom_scale < self.max_zoom_scale:
+            self.zoom_scale = int(2*self.zoom_scale)
+    
+    def zoom_out(self):
+        """Zoom out the view with factor = 2. Max and zoom scales are defined in constructor."""
+        if self.zoom_scale >  1:
+            self.zoom_scale = int(self.zoom_scale//2)
+        
+        relative_height = self.height // 2 // self.zoom_scale
+        if self.shift_y + relative_height >= self.height//2 - self.zoom_scale*2:
+            self.shift_y = self.height//2 - self.zoom_scale*2 - relative_height
+        
+        relative_width = self.width // 2 // self.zoom_scale
+        if self.shift_x + relative_width >= (self.width)//2 - self.zoom_scale*2:
+            self.shift_x = (self.width)//2 - self.zoom_scale*2 - relative_width
+        
+        if self.zoom_scale == 1:
+            self.shift_x = 0
+            self.shift_y = 0
+    
+    def draw_panel(self):
+        shape_surf = pygame.Surface(pygame.Rect(
+            (0, 0, 200, self.height)).size, pygame.SRCALPHA)
+        pygame.draw.rect(shape_surf, Color.white, shape_surf.get_rect())
+        self.win.blit(shape_surf, (self.width, 0, self.width, self.height))
+    
+    def move_up(self):
+        """Move view up when is zoom in."""
+        if self.shift_y - self.shift_step <= 0:
+            self.shift_y = 0
+            return
+        self.shift_y -= self.shift_step
+    
+    def move_down(self):
+        """Move down when is zoom in."""
+        relative_height = self.height // 2 // self.zoom_scale
+        if self.shift_y + relative_height >= self.height//2 - self.zoom_scale*2:
+            return
+        self.shift_y += self.shift_step
+    
+    def move_left(self):
+        """Move left when is zoom in."""
+        if self.shift_x - self.shift_step <= 0:
+            self.shift_x = 0
+            return
+        self.shift_x -= self.shift_step
+    
+    def move_right(self):
+        """Move right when is zoom in."""
+        relative_width = self.width // 2 // self.zoom_scale
+        if self.shift_x + relative_width >= (self.width)//2 - self.zoom_scale*2:
+            return
+        self.shift_x += self.shift_step
