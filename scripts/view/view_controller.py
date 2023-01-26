@@ -13,6 +13,7 @@ class ViewController:
         self.width = width
         self.height = height
         self.gap = gap
+        Spot.set_width(self.gap)
         self.win = pygame.display.set_mode((self.width + 200, self.height))
         Spot.set_window(self.win)
         Button.set_window(self.win)
@@ -91,13 +92,14 @@ class ViewController:
         if self.zoom_scale >  1:
             self.zoom_scale = int(self.zoom_scale//2)
         
-        relative_height = self.height // 2 // self.zoom_scale
-        if self.shift_y + relative_height >= self.height//2 - self.zoom_scale*2:
-            self.shift_y = self.height//2 - self.zoom_scale*2 - relative_height
+        relative_height = self.height // self.gap // self.zoom_scale
+        if self.shift_y + relative_height >= self.height//self.gap - self.zoom_scale*2:
+            self.shift_y = self.height//self.gap - self.zoom_scale*2 - relative_height
         
-        relative_width = self.width // 2 // self.zoom_scale
-        if self.shift_x + relative_width >= (self.width)//2 - self.zoom_scale*2:
-            self.shift_x = (self.width)//2 - self.zoom_scale*2 - relative_width
+        relative_width = self.width // self.gap // self.zoom_scale
+        if self.shift_x + relative_width >= (self.width)//self.gap - self.zoom_scale*2:
+            self.shift_x = (self.width)//self.gap - \
+                self.zoom_scale*2 - relative_width
         
         if self.zoom_scale == 1:
             self.shift_x = 0
@@ -118,8 +120,8 @@ class ViewController:
     
     def move_down(self):
         """Move down when is zoom in."""
-        relative_height = self.height // 2 // self.zoom_scale
-        if self.shift_y + relative_height >= self.height//2 - self.zoom_scale*2:
+        relative_height = self.height // self.gap // self.zoom_scale
+        if self.shift_y + relative_height >= self.height//self.gap - self.zoom_scale*self.gap:
             return
         self.shift_y += self.shift_step
     
@@ -132,7 +134,7 @@ class ViewController:
     
     def move_right(self):
         """Move right when is zoom in."""
-        relative_width = self.width // 2 // self.zoom_scale
-        if self.shift_x + relative_width >= (self.width)//2 - self.zoom_scale*2:
+        relative_width = self.width // self.gap // self.zoom_scale
+        if self.shift_x + relative_width >= (self.width)//self.gap - self.zoom_scale*self.gap:
             return
         self.shift_x += self.shift_step
