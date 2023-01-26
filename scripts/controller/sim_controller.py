@@ -95,6 +95,8 @@ class SimulationController:
             actions = self.get_commanders_actions()
             self.display_actions(actions)
             self.model.apply_actions(actions)
+            for team in self.model.teams:
+                print(team.target_action)
         if self.iteration == 1:
             for team in self.model.teams:
                 team.set_target_action(FighterAction.DIG_DITCH)

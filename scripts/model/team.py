@@ -16,7 +16,7 @@ class Team:
         self.move_team = (0, 0)
 
     def set_target_sector(self, target_sector):
-        self.move_team = (self.move_team[0] + (target_sector[0] - self.target_sector[0]) * 10, self.move_team[0] + (target_sector[1] - self.target_sector[1]) * 10)
+        self.move_team = (self.move_team[0] + (target_sector[0] - self.target_sector[0]) * 10, self.move_team[1] + (target_sector[1] - self.target_sector[1]) * 10)
         self.target_sector = target_sector
 
     def set_target_action(self, target_action):
@@ -36,6 +36,7 @@ class Team:
                 fighter.set_direction(Direction.random_direction())
 
     def run_team(self, model):
+        print(f'Id: {self.team_id}, action: {self.target_action}, target_sector: {self.target_sector}, move: {self.move_team}')
         for fighter in self.fighters:
             fighter.run_action(model)
 
