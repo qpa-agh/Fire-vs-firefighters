@@ -44,7 +44,6 @@ class FighterAction(Enum):
         ]
         return map[randrange(0, 4)]
 
-
 class Fighter:
     DITCH_MAKING_SPEED = 15
     EXTINGUISHING_SPEED = 30

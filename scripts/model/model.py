@@ -1,6 +1,7 @@
 from model.cell import Cell
 from model.fighter import Fighter, FighterAction
 from model.team import Team
+from solver.commander_actions import CommanderLogisticActionFactory
 from utils.enums import Direction, SectorType, TreeType
 from view.spot import Spot
 from view.colors import *
@@ -52,8 +53,7 @@ class Model:
             self.generate_random_forest()
 
         self.teams: list[Team] = []
-        self.generate_fighters(5, [(15, 15), (16, 16), (17, 17), (14, 16), (13, 17), 
-                                    (17, 19), (17, 20), (16, 21), (15, 19), (15, 20), (14, 21), (13, 20), (13, 19)])
+        self.generate_fighters(10, [(15, 15), (16, 16), (17, 17)])
 
     def generate_fighters(self, per_sector, sectors):
         for sector in sectors:
@@ -123,8 +123,11 @@ class Model:
         if self.grid[row][col].is_tree():
             self.grid[row][col].make_fire(self.burning_spread_per_frame)
             self.cells_on_fire.add(self.grid[row][col])
-            if (row // 10, col // 10) not in self.sectors_with_fire:
-                self.sectors_with_fire.append((row // 10, col // 10))
+            sector = (row // 10, col // 10)
+            if sector not in self.sectors_with_fire:
+                self.sectors_with_fire.append(sector)
+                if sector in self.flammable_sectors:
+                    self.flammable_sectors.remove(sector)
 
     def reset_spot(self, row, col):
         if self.grid[row][col].is_on_fire():
@@ -184,3 +187,9 @@ class Model:
 
     def __get_sector_bounds(self, sector):
         return sector[0] * 10, (sector[0] + 1) * 10, sector[1] * 10, (sector[1] + 1) * 10 
+
+    def apply_actions(self, actions):
+        factory = CommanderLogisticActionFactory()
+        for action in actions:
+            working_action = factory.create_action(action)
+            working_action.run_action(self)

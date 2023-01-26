@@ -8,7 +8,21 @@ from view.button_handler import ButtonHandler
 from view.view_controller import ViewController, ViewType
 from controller.fighters_controller import FightersController
 from solver.solver import Solver
-import itertools
+from multiprocessing import Process, Pipe
+import sys
+sys.setrecursionlimit(100000)
+
+
+def new_procees_to_solve_nash(conn):
+    A, Adec, B, Bdec = conn.recv()
+    solver = Solver()
+    print(len(Adec))
+    print(len(Bdec))
+    actions = solver.solve(A, B, Adec, Bdec)
+    print(actions)
+
+    conn.send(actions)
+    conn.close()
 
 
 class SimulationController:
@@ -39,15 +53,30 @@ class SimulationController:
         self.animation_started = False
         self.run = True
         self.iteration = 0
-        self.solver = Solver()
-        self.decision_generator = DecisionsGenerator()
+
+    def get_commanders_actions(self):
+        decision_generator = DecisionsGenerator()
+        A, Adec, B, Bdec = decision_generator.create_game_price_array(self.model)
+        # A = [[3, 1], 
+        #      [0, 2]]
+        # B = [[2, 1], 
+        #      [0, 3]]
+        # Adec = ['0', '1'] 
+        # Bdec = ['0', '1'] 
+        parent_conn, child_conn = Pipe()
+        p = Process(target=new_procees_to_solve_nash, args=(child_conn,))
+        p.start()
+        parent_conn.send([A, Adec, B, Bdec])
+        actions = parent_conn.recv()
+
+        while p.is_alive():
+            for event in pygame.event.get():
+                self.resolve_event(event)
+            p.join(timeout=0.1)
+            print('waiting')
+        return actions
 
     def run_simulation(self) -> None:
-        A = [[3, 1], 
-             [0, 2]]
-        B = [[2, 1], 
-             [0, 3]]
-        self.solver.solve(A, B)
         pygame.init()
         self.view_controller.draw_buttons(self.button_handler)
         while self.run:
@@ -65,12 +94,10 @@ class SimulationController:
         pygame.quit()
 
     def commander(self):
-
-        if self.iteration == 20:
-            A, Adec, B, Bdec = self.decision_generator.create_game_price_array(self.model)
-            print(Adec, Bdec[:50])
-            print(len(Bdec))
-            self.solver.solve(A[:, :50], B[:, :50])
+        if self.iteration % 30 == 16:
+            actions = self.get_commanders_actions()
+            print(actions)
+            self.model.apply_actions(actions)
         if self.iteration == 1:
             for team in self.model.teams:
                 team.set_target_action(FighterAction.DIG_DITCH)
@@ -83,28 +110,7 @@ class SimulationController:
             self.model.teams[2].set_target_action(FighterAction.DIG_DITCH)
             self.model.teams[3].set_target_sector((12, 14))
             self.model.teams[3].set_target_action(FighterAction.DIG_DITCH)
-            self.model.teams[4].set_target_sector((12, 15))
-            self.model.teams[4].set_target_action(FighterAction.DIG_DITCH)
-            self.model.teams[5].set_target_sector((11, 16))
-            self.model.teams[5].set_target_action(FighterAction.DIG_DITCH)
-            self.model.teams[6].set_target_sector((11, 10))
-            self.model.teams[6].set_target_action(FighterAction.DIG_DITCH)
-
-        if self.iteration == 600:
-            self.model.teams[0].set_target_sector((11, 11))
-            self.model.teams[0].set_target_action(FighterAction.EXTINGUISH)
-            self.model.teams[1].set_target_sector((11, 12))
-            self.model.teams[1].set_target_action(FighterAction.EXTINGUISH)
-            self.model.teams[2].set_target_sector((11, 13))
-            self.model.teams[2].set_target_action(FighterAction.EXTINGUISH)
-            self.model.teams[3].set_target_sector((11, 14))
-            self.model.teams[3].set_target_action(FighterAction.EXTINGUISH)
-            self.model.teams[4].set_target_sector((11, 15))
-            self.model.teams[4].set_target_action(FighterAction.EXTINGUISH)
-            self.model.teams[5].set_target_sector((10, 16))
-            self.model.teams[5].set_target_action(FighterAction.EXTINGUISH)
-            self.model.teams[6].set_target_sector((10, 10))
-            self.model.teams[6].set_target_action(FighterAction.EXTINGUISH)
+           
 
     def resolve_event(self, event) -> None:
         if event.type == pygame.QUIT:

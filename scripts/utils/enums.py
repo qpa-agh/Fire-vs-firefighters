@@ -26,6 +26,11 @@ class TreeType(Enum):
     DECIDUOUS = 0,  # WITH LEAVES
     CONIFEROUS = 1
 
+class LogisticAction(Enum):
+    IDLE = 0
+    ADD_NEW_TEAM = 1
+    FALLBACK_TEAM = 2
+
 
 class Direction:
     NW = (-1, -1)
