@@ -26,6 +26,10 @@ class DecisionsGenerator:
         pass
 
     def create_game_price_array(self, model):
+        '''Main function that generates game arrays
+            A - logisitc player array
+            B - fire fighters commander player array
+        '''
         logistic_prices_dict = self.__calculate_logistic_prizes(model)
         team_commander_prices_dict = self.__calculate_team_change_order_prices(model)
 
@@ -39,15 +43,19 @@ class DecisionsGenerator:
             for x, (col, col_decision_value) in enumerate(team_commander_prices_dict.items()):
                 A[y, x] = row_decision_value
                 B[y, x] = col_decision_value
-                if row[1] == LogisticAction.FALLBACK_TEAM:
+
+                team_logistic, team_commander = row[0], col[0]
+                decision_logistic = row[1]
+                if decision_logistic == LogisticAction.FALLBACK_TEAM:
                     B[y, x] += DecisionsGenerator.PRICE_FOR_COMMANDER_FOR_TEAM_CALLBACK
-                    if row[0] == col[0]:
+                    if team_logistic == team_commander:
                         B[y, x] = DecisionsGenerator.PRICE_FOR_COMMANDER_FOR_TEAM_CALLBACK
                         A[y, x] -= col_decision_value / 2
 
         return A, Adecision, B, Bdecision
 
     def __cull_worse_decisions(self, team_commander_prices_dict):
+        '''Delete 90% of weakest'''
         threshold = np.percentile(list(team_commander_prices_dict.values()), 90)
         return dict((key, value) for key, value in team_commander_prices_dict.items() if value >= threshold)
 
@@ -72,6 +80,7 @@ class DecisionsGenerator:
             is_team_useless = team.target_action == FighterAction.IDLE #or team.target_sector not in sector_action_values[team.target_action].keys()
             current_value = -100 if is_team_useless else (0 if team.target_sector not in sector_action_values[team.target_action].keys() else sector_action_values[team.target_action][team.target_sector])
             closest_fire_sector = None if not is_team_useless else self.__find_closest_fire(model, team.target_sector)[0]
+            
             for sector in sector_action_values[FighterAction.EXTINGUISH].keys():
                 move_distance = self.__sector_distance(team.target_sector, sector)
                 if is_team_useless:

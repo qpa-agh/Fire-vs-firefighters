@@ -10,7 +10,8 @@ class CommanderLogisticAction:
         raise NotImplementedError()
 
     def get_model_team(self, model):
-        return [team for team in model.teams if team.team_id == self.team.team_id][0]
+        teams = [team for team in model.teams if team.team_id == self.team.team_id]
+        return None if not teams else teams[0]
 
 class Idle(CommanderLogisticAction):
     def __init__(self, action) -> None:
@@ -38,7 +39,9 @@ class LogisticFallBackTeam(CommanderLogisticAction):
         super().__init__(action)
 
     def run_action(self, model):
-        model.teams.remove(self.get_model_team(model))
+        team = self.get_model_team(model)
+        if team in model.teams:
+            model.teams.remove(team)
 
 class CommanderIdle(CommanderLogisticAction):
     def __init__(self, action) -> None:
@@ -53,8 +56,9 @@ class CommanderChangeTeamOrderAction(CommanderLogisticAction):
 
     def run_action(self, model):
         team = self.get_model_team(model)
-        team.set_target_sector(self.sector)
-        team.set_target_action(self.action_type)
+        if team is not None:
+            team.set_target_sector(self.sector)
+            team.set_target_action(self.action_type)
 
 class CommanderLogisticActionFactory:
     def __init__(self) -> None:

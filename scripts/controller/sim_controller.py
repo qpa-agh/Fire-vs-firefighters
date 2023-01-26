@@ -57,12 +57,6 @@ class SimulationController:
     def get_commanders_actions(self):
         decision_generator = DecisionsGenerator()
         A, Adec, B, Bdec = decision_generator.create_game_price_array(self.model)
-        # A = [[3, 1], 
-        #      [0, 2]]
-        # B = [[2, 1], 
-        #      [0, 3]]
-        # Adec = ['0', '1'] 
-        # Bdec = ['0', '1'] 
         parent_conn, child_conn = Pipe()
         p = Process(target=new_procees_to_solve_nash, args=(child_conn,))
         p.start()
@@ -101,15 +95,15 @@ class SimulationController:
         if self.iteration == 1:
             for team in self.model.teams:
                 team.set_target_action(FighterAction.DIG_DITCH)
-        if self.iteration == 300:
-            self.model.teams[0].set_target_sector((12, 11))
-            self.model.teams[0].set_target_action(FighterAction.DIG_DITCH)
-            self.model.teams[1].set_target_sector((12, 12))
-            self.model.teams[1].set_target_action(FighterAction.DIG_DITCH)
-            self.model.teams[2].set_target_sector((12, 13))
-            self.model.teams[2].set_target_action(FighterAction.DIG_DITCH)
-            self.model.teams[3].set_target_sector((12, 14))
-            self.model.teams[3].set_target_action(FighterAction.DIG_DITCH)
+        # if self.iteration == 300:
+        #     self.model.teams[0].set_target_sector((12, 11))
+        #     self.model.teams[0].set_target_action(FighterAction.DIG_DITCH)
+        #     self.model.teams[1].set_target_sector((12, 12))
+        #     self.model.teams[1].set_target_action(FighterAction.DIG_DITCH)
+        #     self.model.teams[2].set_target_sector((12, 13))
+        #     self.model.teams[2].set_target_action(FighterAction.DIG_DITCH)
+        #     self.model.teams[3].set_target_sector((12, 14))
+        #     self.model.teams[3].set_target_action(FighterAction.DIG_DITCH)
            
 
     def resolve_event(self, event) -> None:
