@@ -14,7 +14,7 @@ class ViewController:
         self.height = height
         self.gap = gap
         Spot.set_width(self.gap)
-        self.win = pygame.display.set_mode((self.width + 200, self.height))
+        self.win = pygame.display.set_mode((self.width + 220, self.height))
         Spot.set_window(self.win)
         Button.set_window(self.win)
         pygame.display.set_caption("Fire figters vs fire")
@@ -43,6 +43,7 @@ class ViewController:
                 Spot.window.blit(text, ((team.target_sector[1] * 10 + 2) * self.gap, (team.target_sector[0] * 10 + 2) * self.gap))
 
         self.draw_compass()
+        self.draw_keys()
         self.draw_time(iteration)
 
     def draw_fighters(self, fighters):
@@ -66,14 +67,23 @@ class ViewController:
         """Draws compass image."""
         imp = pygame.image.load(
             "scripts\img\compass_small.png").convert_alpha()
-        self.win.blit(imp, (self.width + 25, self.height - 190))
+        self.win.blit(imp, (self.width + 35, self.height - 190))
+    
+    def draw_keys(self):
+        """Draws compass image."""
+        imp = pygame.image.load(
+            "scripts\img\controls.png").convert_alpha()
+        self.win.blit(imp, (self.width + 15, 20))
 
     def draw_time(self, iteration):
+        imp = pygame.image.load(
+            "scripts\img\\frame.png").convert_alpha()
+        self.win.blit(imp, (self.width + 15, self.height - 290))
         pygame.draw.rect(Button.window, Color.white, [
-            self.width + 25, self.height - 300, 180, 20])
+            self.width + 25, self.height - 280, 180, 20])
         smallfont = pygame.font.SysFont('Verdana', 16)
         text = smallfont.render("Time: " + "{:.2f}".format(iteration / 15) + " min", True, Color.black)  # 360 it -> 12 min
-        Button.window.blit(text, (self.width + 25, self.height - 300))
+        Button.window.blit(text, (self.width + 35, self.height - 280))
 
     def update(self):
         pygame.display.update()
@@ -110,7 +120,7 @@ class ViewController:
     
     def draw_panel(self):
         shape_surf = pygame.Surface(pygame.Rect(
-            (0, 0, 200, self.height)).size, pygame.SRCALPHA)
+            (0, 0, 220, self.height)).size, pygame.SRCALPHA)
         pygame.draw.rect(shape_surf, Color.white, shape_surf.get_rect())
         self.win.blit(shape_surf, (self.width, 0, self.width, self.height))
     

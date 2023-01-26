@@ -30,20 +30,20 @@ class SimulationController:
         self.width = model.get_width()
         self.height = model.get_height()
 
-        self.BUTTON_LIST_WIND = [("NW", WindDirection.NW, (self.width + 25, self.height - 190)),
+        self.BUTTON_LIST_WIND = [("NW", WindDirection.NW, (self.width + 35, self.height - 190)),
                                  ("N", WindDirection.N,
-                                  (self.width + 94, self.height - 215)),
+                                  (self.width + 104, self.height - 215)),
                                  ("NE", WindDirection.NE,
-                                  (self.width + 145, self.height - 190),),
+                                  (self.width + 155, self.height - 190),),
                                  ("E", WindDirection.E,
-                                  (self.width + 180, self.height - 125),),
+                                  (self.width + 190, self.height - 125),),
                                  ("SE", WindDirection.SE,
-                                  (self.width + 145, self.height - 60)),
+                                  (self.width + 155, self.height - 60)),
                                  ("S", WindDirection.S,
-                                  (self.width + 94, self.height - 35)),
+                                  (self.width + 104, self.height - 35)),
                                  ("SW", WindDirection.SW,
-                                  (self.width + 25, self.height - 60)),
-                                 ("W", WindDirection.W,  (self.width + 5, self.height - 125))]
+                                  (self.width + 35, self.height - 60)),
+                                 ("W", WindDirection.W,  (self.width + 10, self.height - 125))]
 
         self.button_handler_wind = ButtonHandler(self.BUTTON_LIST_WIND)
 
