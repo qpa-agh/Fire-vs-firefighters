@@ -38,6 +38,9 @@ class ViewController:
             self.draw_fog()
             for team in model.teams:
                 self.draw_fighters(team.fighters)
+                smallfont = pygame.font.SysFont('Verdana', 24)
+                text = smallfont.render(str(team.team_id), True, Color.white)
+                Spot.window.blit(text, ((team.target_sector[1] * 10 + 2) * self.gap, (team.target_sector[0] * 10 + 2) * self.gap))
 
         self.draw_compass()
         self.draw_time(iteration)
