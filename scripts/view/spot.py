@@ -10,8 +10,8 @@ class Spot:
     def __init__(self, row, col) -> None:
         self.row = row
         self.col = col
-        self.x = row * View.gap
-        self.y = col * View.gap
+        self.y = row * View.gap
+        self.x = col * View.gap
         self.color = Color.ground
         self.neighbours = []
 
@@ -25,8 +25,8 @@ class Spot:
         draws 10x10 squares.
         """
         pygame.draw.rect(View.window, self.color, 
-                         ((self.y - View.gap*View.shift_x) *View.zoom_scale,
-                         (self.x - View.gap*View.shift_y) * View.zoom_scale, View.gap*View.zoom_scale, 
+                         ((self.x - View.gap*View.shift_x) *View.zoom_scale,
+                         (self.y - View.gap*View.shift_y) * View.zoom_scale, View.gap*View.zoom_scale, 
                          View.gap*View.zoom_scale))
 
     def make_ground(self):

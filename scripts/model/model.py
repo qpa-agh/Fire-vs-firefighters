@@ -48,7 +48,6 @@ class Model:
 
         self.start_x = 0 # start on the image x - img can be bigger
         self.start_y = 0
-        self.zoom = 1
 
         if forest_map:
             self.load_sectors_from_img(forest_map)

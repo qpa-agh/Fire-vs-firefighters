@@ -5,7 +5,6 @@ from view.view_params import View
 
 class Button:
     """Representation of button displayed next to the grid."""
-    window = None
 
     def __init__(self, name, value, pos) -> None:
         self.size_y = 30
