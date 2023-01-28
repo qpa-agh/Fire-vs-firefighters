@@ -3,12 +3,10 @@ from model.fighter import Fighter, FighterAction
 from model.team import Team
 from solver.commander_actions import CommanderLogisticActionFactory
 from utils.enums import Direction, SectorType, TreeType
-from view.spot import Spot
 from view.colors import *
 from view.button import *
 import random
 import cv2
-import numpy as np
 
 
 class Model:
@@ -21,8 +19,9 @@ class Model:
         self.sectors_y = cells_y // 10
         self.sectors_x = cells_x // 10
 
-        self.gap = gap  # width of the spot
-        Spot.set_width(self.gap)
+        View.gap = gap  # width of the spot
+        View.width = gap * self.cells_x
+        View.height = gap * self.cells_y
 
         self.cells_on_fire = set()
         self.wind_direction = None  # WindDirection
@@ -49,7 +48,6 @@ class Model:
 
         self.start_x = 0 # start on the image x - img can be bigger
         self.start_y = 0
-        self.zoom = 1
 
         if forest_map:
             self.load_sectors_from_img(forest_map)
@@ -233,10 +231,3 @@ class Model:
             self.flammable_sectors.append(sector)
         elif sector in self.flammable_sectors and with_tree < 20:
             self.flammable_sectors.remove(sector)
-
-    
-    def get_width(self):
-        return self.gap * self.cells_x
-    
-    def get_height(self):
-        return self.gap * self.cells_y

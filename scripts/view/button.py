@@ -1,10 +1,10 @@
 import pygame
 from view.colors import Color
+from view.view_params import View
 
 
 class Button:
     """Representation of button displayed next to the grid."""
-    window = None
 
     def __init__(self, name, value, pos) -> None:
         self.size_y = 30
@@ -34,12 +34,12 @@ class Button:
 
     def draw(self):
         """Draws square button with its name."""
-        pygame.draw.rect(Button.window, self.color, [
+        pygame.draw.rect(View.window, self.color, [
                          self.text_start_x, self.text_start_y, self.size_x+10, self.size_y],  border_radius=10)
         # text
         smallfont = pygame.font.SysFont('Verdana', 16)
         text = smallfont.render(self.name, True, Color.black)
-        Button.window.blit(text, (self.start_x + 2, self.start_y + 2))
+        View.window.blit(text, (self.start_x + 2, self.start_y + 2))
 
     def is_pushed(self):
         """Checks if button is pushed."""
@@ -55,7 +55,3 @@ class Button:
 
     def get_value(self):
         return self.value
-
-    @staticmethod
-    def set_window(window):
-        Button.window = window

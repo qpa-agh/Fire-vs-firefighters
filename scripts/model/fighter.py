@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from model.model import Model
     from model.cell import Cell
+from view.view_params import View
 
 def moveAction(fighter: Fighter, model: Model) -> None:
     fighter.move_to_target()
@@ -102,8 +103,9 @@ class Fighter:
             return False
         return True
     
-    def draw(self, window, height, width):
-        pygame.draw.rect(window, (255, 255, 0), (self.x * width, self.y * height, width, height))
+    def draw(self):
+        pygame.draw.rect(View.window, (255, 255, 0), ((self.x - View.shift_x)* View.gap*View.zoom_scale,
+                         (self.y - View.shift_y) * View.gap*View.zoom_scale, View.gap*View.zoom_scale, View.gap*View.zoom_scale))
 
     def in_sector(self, sector):
         bounds = sector[0] * 10, (sector[0] + 1) * 10, sector[1] * 10, (sector[1] + 1) * 10
