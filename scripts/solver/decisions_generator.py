@@ -8,17 +8,21 @@ class DecisionsGenerator:
     RELUCTANCY_TO_ADDING_TEAM = 20
     INCENTIVE_TO_ADDING_TEAM_FACTOR = 10
 
-    ONLY_FIRE_EXTINGUISH_VALUE = 20
-    DIG_VALUE_PER_SECTOR_BEHIND = 1
-    DIG_DITCH_DISTANCE_FACTOR = 7
-    DIG_VALUE_FOR_BEING_ON_FIRE = - 100
+    THRESHOLD_CELLS_ON_FIRE_TO_START_DIGGING = 100
+    PUNISHMENT_FOR_DIGGING_BEFORE_THRESHLOD = -50
 
-    EXTINGUISH_FIRE_DISTANCE_SQUARED_FACTOR = 2
-    EXTINGUISH_VALUE_PER_SECTOR_BEHIND = 1
+    DIG_VALUE_PER_SECTOR_BEHIND = 2
+    DIG_DITCH_DISTANCE_FACTOR = 10
+    DIG_VALUE_FOR_BEING_ON_FIRE = - 30
+    DIG_VALUE_FOR_NEIGHBOUR_NON_FLAMMABLE_CELLS = 10
+
+    ONLY_FIRE_EXTINGUISH_VALUE = 100
+    EXTINGUISH_FIRE_DISTANCE_SQUARED_FACTOR = 3
+    EXTINGUISH_VALUE_PER_SECTOR_BEHIND = 2
     EXTINGUISH_VALUE_PER_NEIGHBOURING_SECTOR = 5
     EXTINGUISH_CONSTANT = 10
 
-    SECTOR_MOVE_FACTOR = 4
+    SECTOR_MOVE_FACTOR = 2
 
     PRICE_FOR_COMMANDER_FOR_TEAM_CALLBACK = -50
 
@@ -65,7 +69,7 @@ class DecisionsGenerator:
         threshold = np.percentile(
             list(team_commander_prices_dict.values()), 90)
         return dict((key, value) for key, value in team_commander_prices_dict.items() if value >= threshold)
-    
+
     def compute_necessary_teams(self, sectors_on_fire) -> int:
         if sectors_on_fire <= 2:
             return 1
@@ -92,11 +96,11 @@ class DecisionsGenerator:
         teams_shortage = nr_of_sectors_on_fire - nr_of_teams
         print("sectors on fire: ", nr_of_sectors_on_fire,
               " teams: ", nr_of_teams)
-        if teams_shortage <= -1: # fallback
+        if teams_shortage <= -1:  # fallback
             logistic_order_values[(
                 None, LogisticAction.ADD_NEW_TEAM, None)] = -500
             incentive_to_fallback_a_team = 100
-        
+
         # idle
         # elif nr_of_teams >= nr_of_sectors_on_fire//4 or teams_shortage <= int(nr_of_sectors_on_fire*0.6) or (teams_shortage <= 5 and nr_of_teams >= 2):
         elif nr_of_teams >= self.compute_necessary_teams(nr_of_sectors_on_fire):
@@ -122,41 +126,63 @@ class DecisionsGenerator:
         teams_order_value = {}
         sector_action_values = self.__calculate_sector_usefullness_dict(model)
         for team in model.teams:
-            is_team_useless = team.target_action == FighterAction.IDLE #or team.target_sector not in sector_action_values[team.target_action].keys()
-            current_value = -100 if is_team_useless else (0 if team.target_sector not in sector_action_values[team.target_action].keys() else sector_action_values[team.target_action][team.target_sector])
-            # closest_fire_sector, closest_fire_distance = (None, 1000) if not is_team_useless else self.__find_closest_fire(model, team.target_sector)
-            
-            teams_sectors = [team1.target_sector for team1 in model.teams if team1 != team]
+            is_team_useless = team.target_action == FighterAction.IDLE
+            current_value = -100 if is_team_useless else \
+                (0 if team.target_sector not in sector_action_values[team.target_action].keys() else sector_action_values[team.target_action][team.target_sector])
+
+            teams_sectors = [
+                team1.target_sector for team1 in model.teams if team1 != team]
             for sector in sector_action_values[FighterAction.EXTINGUISH].keys():
-                closest_fire_sector_to_target_sector, closest_fire_distance_to_target_sector = self.__find_closest_fire(model, sector)
+                closest_fire_sector_to_target_sector, closest_fire_distance_to_target_sector = self.__find_closest_fire(
+                    model, sector)
                 if closest_fire_distance_to_target_sector > 4 or sector in teams_sectors:
                     continue
+                
+                move_distance = self.__sector_distance(
+                    team.target_sector, sector)
 
-                move_distance = self.__sector_distance(team.target_sector, sector)
-               
-                teams_order_value[(team, FighterAction.EXTINGUISH, sector)] = sector_action_values[FighterAction.EXTINGUISH][sector] - move_distance * DecisionsGenerator.SECTOR_MOVE_FACTOR - current_value
-                teams_order_value[(team, FighterAction.DIG_DITCH, sector)] = sector_action_values[FighterAction.DIG_DITCH][sector] - move_distance * DecisionsGenerator.SECTOR_MOVE_FACTOR - current_value
+                teams_order_value[(team, FighterAction.EXTINGUISH, sector)] = sector_action_values[FighterAction.EXTINGUISH][sector] - \
+                    move_distance * DecisionsGenerator.SECTOR_MOVE_FACTOR - current_value
+                teams_order_value[(team, FighterAction.DIG_DITCH, sector)] = sector_action_values[FighterAction.DIG_DITCH][sector] - \
+                    move_distance * DecisionsGenerator.SECTOR_MOVE_FACTOR - current_value
 
         return teams_order_value
 
     def __calculate_sector_usefullness_dict(self, model):
+        cells_on_fire = len(model.cells_on_fire)
         values = {FighterAction.EXTINGUISH: {}, FighterAction.DIG_DITCH: {}}
-        for sector in tuple([*model.flammable_sectors, *model.sectors_with_fire, *[team.target_sector for team in model.teams]]):
-            closest_fire_sector, fire_sector_distance = self.__find_closest_fire(model, sector)
-            if closest_fire_sector is None:
+        for sector in set([*model.flammable_sectors, *model.sectors_with_fire, *[team.target_sector for team in model.teams]]):
+            closest_fire_sector, fire_sector_distance = self.__find_closest_fire(
+                model, sector)
+            if closest_fire_sector is None or (sector not in model.flammable_sectors and sector not in model.sectors_with_fire):
                 values[FighterAction.DIG_DITCH][sector] = 0
                 values[FighterAction.EXTINGUISH][sector] = 0
                 continue
 
-            points_for_sectors_behind = self.__calculate_flammable_sectors_behind(model, sector, closest_fire_sector) * DecisionsGenerator.PARAMETERS_FITTED_FOR_NUMBER_OF_SECTORS / (model.sectors_y * model.sectors_x)
-            neighbouring_sectors_with_fire = self.__calculate_close_fire_sectors(model, sector)
+            points_for_sectors_behind = self.__calculate_flammable_sectors_behind(
+                model, sector, closest_fire_sector) * DecisionsGenerator.PARAMETERS_FITTED_FOR_NUMBER_OF_SECTORS / (model.sectors_y * model.sectors_x)
+            neighbouring_sectors_with_fire = self.__calculate_close_fire_sectors(
+                model, sector)
+            neighbouring_sectors_non_flammable = self.__calculate_close_non_flammable_sectors(
+                            model, sector)
             if sector in model.sectors_with_fire:
-                values[FighterAction.DIG_DITCH][sector] = DecisionsGenerator.DIG_VALUE_FOR_BEING_ON_FIRE
-                values[FighterAction.EXTINGUISH][sector] = 3 * DecisionsGenerator.EXTINGUISH_CONSTANT + points_for_sectors_behind * DecisionsGenerator.EXTINGUISH_VALUE_PER_SECTOR_BEHIND - (neighbouring_sectors_with_fire ** 2 - neighbouring_sectors_with_fire * 3) * DecisionsGenerator.EXTINGUISH_VALUE_PER_NEIGHBOURING_SECTOR
+                values[FighterAction.DIG_DITCH][sector] = DecisionsGenerator.DIG_VALUE_FOR_BEING_ON_FIRE + neighbouring_sectors_non_flammable * DecisionsGenerator.DIG_VALUE_FOR_NEIGHBOUR_NON_FLAMMABLE_CELLS
+                values[FighterAction.EXTINGUISH][sector] = 3 * DecisionsGenerator.EXTINGUISH_CONSTANT + points_for_sectors_behind * DecisionsGenerator.EXTINGUISH_VALUE_PER_SECTOR_BEHIND - \
+                    (neighbouring_sectors_with_fire ** 2 - neighbouring_sectors_with_fire *
+                     2) * DecisionsGenerator.EXTINGUISH_VALUE_PER_NEIGHBOURING_SECTOR
                 continue
 
-            values[FighterAction.DIG_DITCH][sector] = points_for_sectors_behind *  DecisionsGenerator.DIG_VALUE_PER_SECTOR_BEHIND - fire_sector_distance * DecisionsGenerator.DIG_DITCH_DISTANCE_FACTOR
-            values[FighterAction.EXTINGUISH][sector] = DecisionsGenerator.EXTINGUISH_CONSTANT + points_for_sectors_behind * DecisionsGenerator.EXTINGUISH_VALUE_PER_SECTOR_BEHIND - (fire_sector_distance ** 2) * DecisionsGenerator.EXTINGUISH_FIRE_DISTANCE_SQUARED_FACTOR  + neighbouring_sectors_with_fire * DecisionsGenerator.EXTINGUISH_VALUE_PER_NEIGHBOURING_SECTOR
+            values[FighterAction.DIG_DITCH][sector] = points_for_sectors_behind * \
+                DecisionsGenerator.DIG_VALUE_PER_SECTOR_BEHIND + \
+                (- fire_sector_distance ** 2 + 3 * fire_sector_distance) * DecisionsGenerator.DIG_DITCH_DISTANCE_FACTOR + \
+                max(neighbouring_sectors_non_flammable, 2) * DecisionsGenerator.DIG_VALUE_FOR_NEIGHBOUR_NON_FLAMMABLE_CELLS
+            values[FighterAction.EXTINGUISH][sector] = DecisionsGenerator.EXTINGUISH_CONSTANT + points_for_sectors_behind * DecisionsGenerator.EXTINGUISH_VALUE_PER_SECTOR_BEHIND - \
+                (fire_sector_distance ** 2) * DecisionsGenerator.EXTINGUISH_FIRE_DISTANCE_SQUARED_FACTOR + \
+                neighbouring_sectors_with_fire * \
+                DecisionsGenerator.EXTINGUISH_VALUE_PER_NEIGHBOURING_SECTOR
+
+            if cells_on_fire < DecisionsGenerator.THRESHOLD_CELLS_ON_FIRE_TO_START_DIGGING:
+                values[FighterAction.DIG_DITCH][sector] += DecisionsGenerator.PUNISHMENT_FOR_DIGGING_BEFORE_THRESHLOD
 
         return values
 
@@ -165,6 +191,16 @@ class DecisionsGenerator:
         for fire_sector in model.sectors_with_fire:
             if abs(fire_sector[0] - sector[0]) <= 1 and abs(fire_sector[1] - sector[1]) <= 1 and fire_sector != sector:
                 count += 1
+        return count
+
+    def __calculate_close_non_flammable_sectors(self, model, sector):
+        count = 8
+        for y in range(sector[0] - 1, sector[0] + 2):
+            for x in range(sector[1] - 1, sector[1] + 2):
+                neighbour = (y, x)
+                if neighbour == sector:
+                    continue
+                count -= int(neighbour in model.flammable_sectors or neighbour in model.sectors_with_fire)
         return count
 
     def __find_closest_fire(self, model, sector):

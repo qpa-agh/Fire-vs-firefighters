@@ -47,6 +47,7 @@ class FireController:
                 new_generation.add(cell)
 
         model.cells_on_fire = new_generation
+        model.update_sectors()
         if not model.cells_on_fire:  # animation ended or not started
             animation_started = False
         return animation_started

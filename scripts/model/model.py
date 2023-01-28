@@ -99,7 +99,7 @@ class Model:
         for sector_row in range(self.sectors_y):
             for sector_col in range(self.sectors_x):
                 sector = (sector_row, sector_col)
-                if sectors_flammable_cells[sector] >= 30:
+                if sectors_flammable_cells[sector] >= 20:
                     self.flammable_sectors.append(sector)
 
 
@@ -207,25 +207,32 @@ class Model:
             working_action = factory.create_action(action)
             working_action.run_action(self)
 
+    def update_sectors(self):
+        for sector in set([(cell.row // 10, cell.col // 10) for cell in self.cells_on_fire]):
+            self.update_sector_on_fire(sector)
+
     def update_sector_on_fire(self, sector):
         bounds = self.__get_sector_bounds(sector)
-        on_fire = False
+        fire_threshold = max(1, min(10, len(self.cells_on_fire) // 20))
+        on_fire = 0
+        with_tree = 0
         for y, row in enumerate(self.grid[bounds[0]: bounds[1]]):
-            if on_fire:
-                break
             for x, cell in enumerate(row[bounds[2]: bounds[3]]):
-                if cell.is_on_fire():
-                    on_fire = True
-                    break
+                on_fire += int(cell.is_on_fire())
+                with_tree += int(cell.has_wood_to_burn())
         
-        if on_fire and sector not in self.sectors_with_fire:
+        if on_fire > fire_threshold and sector not in self.sectors_with_fire:
             self.sectors_with_fire.append(sector)
             if sector in self.flammable_sectors:
                 self.flammable_sectors.remove(sector)
-        if not on_fire and sector in self.sectors_with_fire:
+            return
+
+        if on_fire <= fire_threshold and sector in self.sectors_with_fire:
             self.sectors_with_fire.remove(sector)
-            if sector not in self.flammable_sectors:
-                self.flammable_sectors.append(sector)
+        if sector not in self.flammable_sectors and with_tree >= 20:
+            self.flammable_sectors.append(sector)
+        elif sector in self.flammable_sectors and with_tree < 20:
+            self.flammable_sectors.remove(sector)
 
     
     def get_width(self):

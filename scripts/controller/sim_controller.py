@@ -65,8 +65,8 @@ class SimulationController:
         actions = parent_conn.recv()
 
         while p.is_alive():
-            for event in pygame.event.get():
-                self.resolve_event(event)
+            self.resolve_events()
+            self.view_controller.update()
             p.join(timeout=0.1)
             print('waiting')
         return actions
@@ -79,8 +79,7 @@ class SimulationController:
             self.view_controller.draw_model(self.model, self.iteration)
             self.view_controller.draw_buttons(self.button_handler_wind)
 
-            for event in pygame.event.get():
-                self.resolve_event(event)
+            self.resolve_events()
 
             self.animation_started = self.fire_controller.spread_fire(
                 self.model, self.animation_started)
@@ -97,10 +96,10 @@ class SimulationController:
             self.model.apply_actions(actions)
             for team in self.model.teams:
                 print(team.target_action)
-        if self.iteration == 1:
-            for team in self.model.teams:
-                team.set_target_action(FighterAction.DIG_DITCH)
-           
+
+    def resolve_events(self):
+        for event in pygame.event.get():
+            self.resolve_event(event)
 
     def resolve_event(self, event) -> None:
         if event.type == pygame.QUIT:
