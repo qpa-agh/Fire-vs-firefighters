@@ -3,12 +3,10 @@ from model.fighter import Fighter, FighterAction
 from model.team import Team
 from solver.commander_actions import CommanderLogisticActionFactory
 from utils.enums import Direction, SectorType, TreeType
-from view.spot import Spot
 from view.colors import *
 from view.button import *
 import random
 import cv2
-import numpy as np
 
 
 class Model:
@@ -21,8 +19,9 @@ class Model:
         self.sectors_y = cells_y // 10
         self.sectors_x = cells_x // 10
 
-        self.gap = gap  # width of the spot
-        Spot.set_width(self.gap)
+        View.gap = gap  # width of the spot
+        View.width = gap * self.cells_x
+        View.height = gap * self.cells_y
 
         self.cells_on_fire = set()
         self.wind_direction = None  # WindDirection
@@ -226,10 +225,3 @@ class Model:
             self.sectors_with_fire.remove(sector)
             if sector not in self.flammable_sectors:
                 self.flammable_sectors.append(sector)
-
-    
-    def get_width(self):
-        return self.gap * self.cells_x
-    
-    def get_height(self):
-        return self.gap * self.cells_y

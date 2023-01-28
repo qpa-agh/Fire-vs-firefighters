@@ -1,18 +1,17 @@
 from utils.enums import TreeType
 from view.colors import Color
+from view.view_params import View
 import pygame
 
 
 class Spot:
     """Representation of the pixel on a grid."""
-    width = None  # spots width = gap between 2 lines
-    window = None
 
     def __init__(self, row, col) -> None:
         self.row = row
         self.col = col
-        self.x = row * Spot.width
-        self.y = col * Spot.width
+        self.x = row * View.gap
+        self.y = col * View.gap
         self.color = Color.ground
         self.neighbours = []
 
@@ -20,13 +19,15 @@ class Spot:
         """Returns idx of row and column of the object."""
         return self.row, self.col
 
-    def draw(self, zoom, shift_y, shift_x):
+    def draw(self):
         """
         Draw the square with proper color and standaralized size in CELL mode, otherways
         draws 10x10 squares.
         """
-        pygame.draw.rect(Spot.window, self.color, ((self.y - Spot.width*shift_x) *
-                         zoom, (self.x - Spot.width*shift_y)*zoom, Spot.width*zoom, Spot.width*zoom))
+        pygame.draw.rect(View.window, self.color, 
+                         ((self.y - View.gap*View.shift_x) *View.zoom_scale,
+                         (self.x - View.gap*View.shift_y) * View.zoom_scale, View.gap*View.zoom_scale, 
+                         View.gap*View.zoom_scale))
 
     def make_ground(self):
         self.color = Color.ground
@@ -42,35 +43,13 @@ class Spot:
         self.color = Color.burned[int(burned_wood-20)//20]
 
     def make_tree(self, wood, tree_type: TreeType, moisture: float):
-        # color_add = (0, 0, 0)
-        # if moisture > 0.2:
-        #     color_add = (5, 5, 10)
-        # if moisture > 0.5:
-        #     color_add = (10, 10, 20)
-        # if moisture > 1:
-        #     color_add = (20, 20, 50)
-        # if moisture > 2:
-        #     color_add = (30, 30, 75)
         if tree_type == TreeType.DECIDUOUS:
             self.color = Color.tree[int(wood//20-1)]
         else:
             self.color = Color.tree_col[int(wood//20-1)]
-
-    # def add_color(self, color1, color2):
-    #     return (min(255, color1[0] + color2[0]), min(255, color1[1] + color2[1]), min(255, color1[2] + color2[2]))
 
     def make_water(self):
         self.color = Color.water
 
     def make_grass(self):
         self.color = Color.grass_green
-
-    @staticmethod
-    def set_width(width):
-        """Sets global parameters for all dots."""
-        Spot.width = width
-
-    @staticmethod
-    def set_window(window):
-        """Sets global parameters for all dots."""
-        Spot.window = window

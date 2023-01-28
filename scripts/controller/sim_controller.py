@@ -9,6 +9,7 @@ from view.view_controller import ViewController, ViewType
 from controller.fighters_controller import FightersController
 from solver.solver import Solver
 from multiprocessing import Process, Pipe
+from view.view_params import View
 import sys
 sys.setrecursionlimit(100000)
 
@@ -27,27 +28,25 @@ def new_procees_to_solve_nash(conn):
 class SimulationController:
     def __init__(self, model: Model) -> None:
         self.model = model
-        self.width = model.get_width()
-        self.height = model.get_height()
 
-        self.BUTTON_LIST_WIND = [("NW", WindDirection.NW, (self.width + 35, self.height - 190)),
+        self.BUTTON_LIST_WIND = [("NW", WindDirection.NW, (View.width + 35, View.height - 190)),
                                  ("N", WindDirection.N,
-                                  (self.width + 104, self.height - 215)),
+                                  (View.width + 104, View.height - 215)),
                                  ("NE", WindDirection.NE,
-                                  (self.width + 155, self.height - 190),),
+                                  (View.width + 155, View.height - 190),),
                                  ("E", WindDirection.E,
-                                  (self.width + 190, self.height - 125),),
+                                  (View.width + 190, View.height - 125),),
                                  ("SE", WindDirection.SE,
-                                  (self.width + 155, self.height - 60)),
+                                  (View.width + 155, View.height - 60)),
                                  ("S", WindDirection.S,
-                                  (self.width + 104, self.height - 35)),
+                                  (View.width + 104, View.height - 35)),
                                  ("SW", WindDirection.SW,
-                                  (self.width + 35, self.height - 60)),
-                                 ("W", WindDirection.W,  (self.width + 10, self.height - 125))]
+                                  (View.width + 35, View.height - 60)),
+                                 ("W", WindDirection.W,  (View.width + 10, View.height - 125))]
 
         self.button_handler_wind = ButtonHandler(self.BUTTON_LIST_WIND)
 
-        self.view_controller = ViewController(self.width, self.height, self.model.gap)
+        self.view_controller = ViewController()
         self.fire_controller = FireController()
         self.fighters_controller = FightersController()
 
