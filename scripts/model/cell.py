@@ -40,7 +40,7 @@ class Cell:
         self.cell_type = CellType.TREE
         self.moisture = 0.6 if tree_type == TreeType.DECIDUOUS else 0.4
         self.wood = random.randint(10, 25) * tree_factor
-        self.visual.make_tree(self.wood, tree_type)
+        self.visual.make_tree(self.wood, tree_type, self.moisture)
 
     def make_burned(self):
         self.cell_type == CellType.BURNED
@@ -56,7 +56,7 @@ class Cell:
         if self.wood <= 0:
             self.make_ground()
         else:
-            self.visual.make_tree(self.wood, self.tree_type)
+            self.visual.make_tree(self.wood, self.tree_type, self.moisture)
 
     def extinguish(self, extinguishing_speed, moisture_increase_factor):
         if self.wood <= 0 and self.burning_wood <= 0:
@@ -69,7 +69,7 @@ class Cell:
             self.visual.make_fire(self.wood, self.burning_wood, self.burned_wood)
         else:
             self.cell_type = CellType.TREE
-            self.visual.make_tree(self.wood, self.tree_type)
+            self.visual.make_tree(self.wood, self.tree_type, self.moisture)
 
     def has_wood_to_burn(self) -> bool:
         return self.wood + self.burning_wood > 0

@@ -41,11 +41,23 @@ class Spot:
     def make_burned(self, burned_wood: int):
         self.color = Color.burned[int(burned_wood-20)//20]
 
-    def make_tree(self, wood, tree_type: TreeType):
+    def make_tree(self, wood, tree_type: TreeType, moisture: float):
+        # color_add = (0, 0, 0)
+        # if moisture > 0.2:
+        #     color_add = (5, 5, 10)
+        # if moisture > 0.5:
+        #     color_add = (10, 10, 20)
+        # if moisture > 1:
+        #     color_add = (20, 20, 50)
+        # if moisture > 2:
+        #     color_add = (30, 30, 75)
         if tree_type == TreeType.DECIDUOUS:
             self.color = Color.tree[int(wood//20-1)]
         else:
             self.color = Color.tree_col[int(wood//20-1)]
+
+    # def add_color(self, color1, color2):
+    #     return (min(255, color1[0] + color2[0]), min(255, color1[1] + color2[1]), min(255, color1[2] + color2[2]))
 
     def make_water(self):
         self.color = Color.water

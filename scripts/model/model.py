@@ -206,6 +206,27 @@ class Model:
         for action in actions:
             working_action = factory.create_action(action)
             working_action.run_action(self)
+
+    def update_sector_on_fire(self, sector):
+        bounds = self.__get_sector_bounds(sector)
+        on_fire = False
+        for y, row in enumerate(self.grid[bounds[0]: bounds[1]]):
+            if on_fire:
+                break
+            for x, cell in enumerate(row[bounds[2]: bounds[3]]):
+                if cell.is_on_fire():
+                    on_fire = True
+                    break
+        
+        if on_fire and sector not in self.sectors_with_fire:
+            self.sectors_with_fire.append(sector)
+            if sector in self.flammable_sectors:
+                self.flammable_sectors.remove(sector)
+        if not on_fire and sector in self.sectors_with_fire:
+            self.sectors_with_fire.remove(sector)
+            if sector not in self.flammable_sectors:
+                self.flammable_sectors.append(sector)
+
     
     def get_width(self):
         return self.gap * self.cells_x
