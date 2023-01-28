@@ -84,17 +84,19 @@ class SimulationController:
                 self.model, self.animation_started)
             self.fighters_controller.run_fighters(
                 self.model, self.animation_started)
+            if not self.model.cells_on_fire:  # animation ended or not started
+                self.animation_started = False
             self.commander()
             self.view_controller.update()
         pygame.quit()
 
     def commander(self):
+        if not self.animation_started:
+            return
         if self.iteration % 30 == 16:
             actions = self.get_commanders_actions()
             self.display_actions(actions)
             self.model.apply_actions(actions)
-            for team in self.model.teams:
-                print(team.target_action)
 
     def resolve_events(self):
         for event in pygame.event.get():
@@ -155,9 +157,10 @@ class SimulationController:
                 self.model.reset_spot(row, col)
 
     def display_actions(self, actions):
-        for action in actions:
-            print(" --------")
-            print("Action:")
-            team, move, pos = action
-            if team: print("team:", team.target_action, team.target_action)
-            print("move:", move, "  pos:", pos)
+        pass
+    #     for action in actions:
+    #         print(" --------")
+    #         print("Action:")
+    #         team, move, pos = action
+    #         if team: print("team:", team.target_action, team.target_action)
+    #         print("move:", move, "  pos:", pos)

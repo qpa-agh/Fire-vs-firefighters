@@ -66,7 +66,6 @@ class CommanderLogisticActionFactory:
 
     def create_action(self, action) -> CommanderLogisticAction:
         action_type = action[1]
-        print(action_type)
         if isinstance(action_type, LogisticAction):
             if action_type == LogisticAction.IDLE:
                 return LogisticIdle(action)
@@ -78,7 +77,6 @@ class CommanderLogisticActionFactory:
             if action_type == FighterAction.IDLE:
                 return LogisticIdle(action)
             if action_type == FighterAction.DIG_DITCH or action_type == FighterAction.EXTINGUISH:
-                print(action)
                 return CommanderChangeTeamOrderAction(action)
 
         return Idle(action)

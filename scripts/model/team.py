@@ -36,7 +36,6 @@ class Team:
                 fighter.set_direction(Direction.random_direction())
 
     def run_team(self, model):
-        print(f'Id: {self.team_id}, action: {self.target_action}, target_sector: {self.target_sector}, move: {self.move_team}')
         for fighter in self.fighters:
             fighter.run_action(model)
         if self.target_action == FighterAction.EXTINGUISH or self.target_action == FighterAction.DIG_DITCH:

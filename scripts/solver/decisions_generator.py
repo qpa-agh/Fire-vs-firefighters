@@ -1,3 +1,4 @@
+from re import S
 from model.fighter import FighterAction
 import numpy as np
 from utils.enums import LogisticAction
@@ -20,7 +21,8 @@ class DecisionsGenerator:
     EXTINGUISH_FIRE_DISTANCE_SQUARED_FACTOR = 3
     EXTINGUISH_VALUE_PER_SECTOR_BEHIND = 2
     EXTINGUISH_VALUE_PER_NEIGHBOURING_SECTOR = 5
-    EXTINGUISH_CONSTANT = 10
+    EXTINGUISH_CONSTANT = 30
+    EXTINGUISH_VALUE_FOR_DISTANCE_FROM_OTHER_TEAMS = 2
 
     SECTOR_MOVE_FACTOR = 2
 
@@ -66,9 +68,12 @@ class DecisionsGenerator:
 
     def __cull_worse_decisions(self, team_commander_prices_dict):
         '''Delete 90% of weakest'''
-        threshold = np.percentile(
-            list(team_commander_prices_dict.values()), 90)
-        return dict((key, value) for key, value in team_commander_prices_dict.items() if value >= threshold)
+        result = team_commander_prices_dict
+        while len(result) > 100:
+            threshold = np.percentile(
+                list(result.values()), 70)
+            result = dict((key, value) for key, value in result.items() if value >= threshold)
+        return result
 
     def compute_necessary_teams(self, sectors_on_fire) -> int:
         if sectors_on_fire <= 2:
@@ -113,9 +118,6 @@ class DecisionsGenerator:
                 None, LogisticAction.ADD_NEW_TEAM, None)] = 100
             incentive_to_fallback_a_team = -500
 
-        print("Add new team: ", logistic_order_values[(
-            None, LogisticAction.ADD_NEW_TEAM, None)])
-
         for team in model.teams:
             logistic_order_values[(
                 team, LogisticAction.FALLBACK_TEAM, None)] = incentive_to_fallback_a_team
@@ -138,15 +140,27 @@ class DecisionsGenerator:
                 if closest_fire_distance_to_target_sector > 4 or sector in teams_sectors:
                     continue
                 
+                average_distance_to_other_teams = self.__calculate_average_distance_to_other_teams(sector, teams_sectors)
                 move_distance = self.__sector_distance(
                     team.target_sector, sector)
 
                 teams_order_value[(team, FighterAction.EXTINGUISH, sector)] = sector_action_values[FighterAction.EXTINGUISH][sector] - \
-                    move_distance * DecisionsGenerator.SECTOR_MOVE_FACTOR - current_value
+                    move_distance * DecisionsGenerator.SECTOR_MOVE_FACTOR - current_value + average_distance_to_other_teams * DecisionsGenerator.EXTINGUISH_VALUE_FOR_DISTANCE_FROM_OTHER_TEAMS
                 teams_order_value[(team, FighterAction.DIG_DITCH, sector)] = sector_action_values[FighterAction.DIG_DITCH][sector] - \
-                    move_distance * DecisionsGenerator.SECTOR_MOVE_FACTOR - current_value
+                    move_distance * DecisionsGenerator.SECTOR_MOVE_FACTOR - current_value + average_distance_to_other_teams * DecisionsGenerator.EXTINGUISH_VALUE_FOR_DISTANCE_FROM_OTHER_TEAMS
 
         return teams_order_value
+
+    def __calculate_average_distance_to_other_teams(self, sector, teams_sectors):
+        if len(teams_sectors) == 0:
+            return 0
+        y_sum, x_sum = 0, 0
+        for team_sector in teams_sectors:
+            y_sum += team_sector[0]
+            x_sum += team_sector[1]
+
+        average_team_sector = (y_sum / len(teams_sectors), x_sum / len(teams_sectors))
+        return self.__sector_distance(sector, average_team_sector)
 
     def __calculate_sector_usefullness_dict(self, model):
         cells_on_fire = len(model.cells_on_fire)
@@ -159,7 +173,7 @@ class DecisionsGenerator:
                 values[FighterAction.EXTINGUISH][sector] = 0
                 continue
 
-            points_for_sectors_behind = self.__calculate_flammable_sectors_behind(
+            points_for_sectors_behind = self.__calculate_flammable_sectors_defended_by_sector(
                 model, sector, closest_fire_sector) * DecisionsGenerator.PARAMETERS_FITTED_FOR_NUMBER_OF_SECTORS / (model.sectors_y * model.sectors_x)
             neighbouring_sectors_with_fire = self.__calculate_close_fire_sectors(
                 model, sector)
@@ -173,8 +187,8 @@ class DecisionsGenerator:
                 continue
 
             values[FighterAction.DIG_DITCH][sector] = points_for_sectors_behind * \
-                DecisionsGenerator.DIG_VALUE_PER_SECTOR_BEHIND + \
-                (- fire_sector_distance ** 2 + 3 * fire_sector_distance) * DecisionsGenerator.DIG_DITCH_DISTANCE_FACTOR + \
+                DecisionsGenerator.DIG_VALUE_PER_SECTOR_BEHIND - \
+                fire_sector_distance * DecisionsGenerator.DIG_DITCH_DISTANCE_FACTOR + \
                 max(neighbouring_sectors_non_flammable, 2) * DecisionsGenerator.DIG_VALUE_FOR_NEIGHBOUR_NON_FLAMMABLE_CELLS
             values[FighterAction.EXTINGUISH][sector] = DecisionsGenerator.EXTINGUISH_CONSTANT + points_for_sectors_behind * DecisionsGenerator.EXTINGUISH_VALUE_PER_SECTOR_BEHIND - \
                 (fire_sector_distance ** 2) * DecisionsGenerator.EXTINGUISH_FIRE_DISTANCE_SQUARED_FACTOR + \
@@ -216,20 +230,28 @@ class DecisionsGenerator:
 
         return closest_fire_sector, min_distance
 
-    def __calculate_flammable_sectors_behind(self, model, sector, closest_fire_sector):
+    def __calculate_flammable_sectors_defended_by_sector(self, model, sector, closest_fire_sector):
         y_sector_distance = sector[0] - closest_fire_sector[0]
         x_sector_distance = sector[1] - closest_fire_sector[1]
         # 0 degrees is x axis
         behind_alfa = np.angle(
             complex(x_sector_distance, y_sector_distance), deg=True)
 
+        for y in range(min(closest_fire_sector[0], sector[0]), 1 + max(closest_fire_sector[0], sector[0])):
+            for x in range(min(closest_fire_sector[1], sector[1]), 1 + max(closest_fire_sector[1], sector[1])):
+                checked_sector = (y, x)
+                if checked_sector in model.sectors_with_fire:
+                    continue # <3
+                if checked_sector not in model.flammable_sectors:
+                    return 0
+
         flammable_sectors_behind = 0
         for flammable_sector in model.flammable_sectors:
             alfa = np.angle(complex(
                 flammable_sector[1] - sector[1], flammable_sector[0] - sector[0]), deg=True)
-            # check if flammable sector direction is in a 90 deg arc from target sector
+            # check if flammable sector direction is in a 30 deg arc from target sector
             angle_diff = (alfa - behind_alfa + 180 + 360) % 360 - 180
-            if angle_diff <= 45 and angle_diff >= -45:
+            if angle_diff <= 15 and angle_diff >= -15:
                 flammable_sectors_behind += 1
 
         return flammable_sectors_behind
