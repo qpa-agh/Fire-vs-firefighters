@@ -88,6 +88,7 @@ class SimulationController:
                 self.animation_started = False
             self.commander()
             self.view_controller.update()
+            self.view_controller.save_image(self.iteration, 'screenshots/screenshot')
         pygame.quit()
 
     def commander(self):

@@ -80,6 +80,9 @@ class ViewController:
 
     def update(self):
         pygame.display.update()
+        
+    def save_image(self, iteration, path):
+        pygame.image.save(View.window, f"{path}_{str(iteration).zfill(5)}.png")
 
     def get_clicked_pos(self, pos) -> tuple():
         """Returns row and columns idx of clicked place."""
